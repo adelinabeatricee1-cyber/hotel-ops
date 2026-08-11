@@ -1,3 +1,4 @@
+import { Users } from "lucide-react";
 import { createClient } from "@/lib/supabase/server";
 import type { Staff } from "@/types/database";
 import { AddStaffForm } from "./add-staff-form";
@@ -13,13 +14,18 @@ export default async function StaffPage() {
 
   return (
     <div>
-      <h1 className="text-2xl font-semibold text-slate-900">Personal</h1>
+      <div className="flex items-center gap-2.5">
+        <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-indigo-100 text-indigo-600">
+          <Users className="h-5 w-5" />
+        </div>
+        <h1 className="text-2xl font-bold text-slate-900">Personal</h1>
+      </div>
 
-      <div className="mt-4 rounded-lg border border-slate-200 bg-white p-4">
+      <div className="mt-5 rounded-xl border border-slate-100 bg-white p-4 shadow-sm">
         <AddStaffForm />
       </div>
 
-      <div className="mt-4 rounded-lg border border-slate-200 bg-white p-4">
+      <div className="mt-4 rounded-xl border border-slate-100 bg-white p-4 shadow-sm">
         {staff && staff.length > 0 ? (
           <table className="w-full">
             <thead>

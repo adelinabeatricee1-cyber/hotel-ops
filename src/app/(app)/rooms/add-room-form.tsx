@@ -1,6 +1,7 @@
 "use client";
 
 import { useActionState, useEffect, useRef } from "react";
+import { Plus } from "lucide-react";
 import { createRoom } from "./actions";
 
 export function AddRoomForm() {
@@ -24,7 +25,7 @@ export function AddRoomForm() {
           name="number"
           required
           placeholder="101"
-          className="mt-1 w-24 rounded-md border border-slate-300 px-2 py-1.5 text-sm"
+          className="mt-1 w-24 rounded-lg border border-slate-300 px-2 py-1.5 text-sm shadow-sm focus:border-indigo-500 focus:outline-none focus:ring-2 focus:ring-indigo-500/20"
         />
       </div>
       <div>
@@ -36,7 +37,7 @@ export function AddRoomForm() {
           name="floor"
           type="number"
           placeholder="1"
-          className="mt-1 w-20 rounded-md border border-slate-300 px-2 py-1.5 text-sm"
+          className="mt-1 w-20 rounded-lg border border-slate-300 px-2 py-1.5 text-sm shadow-sm focus:border-indigo-500 focus:outline-none focus:ring-2 focus:ring-indigo-500/20"
         />
       </div>
       <div>
@@ -47,14 +48,15 @@ export function AddRoomForm() {
           id="type"
           name="type"
           placeholder="Single / Dublă..."
-          className="mt-1 w-36 rounded-md border border-slate-300 px-2 py-1.5 text-sm"
+          className="mt-1 w-36 rounded-lg border border-slate-300 px-2 py-1.5 text-sm shadow-sm focus:border-indigo-500 focus:outline-none focus:ring-2 focus:ring-indigo-500/20"
         />
       </div>
       <button
         type="submit"
         disabled={pending}
-        className="rounded-md bg-slate-900 px-3 py-1.5 text-sm font-medium text-white hover:bg-slate-800 disabled:opacity-60"
+        className="inline-flex items-center gap-1.5 rounded-lg bg-gradient-to-r from-indigo-600 to-violet-600 px-3 py-1.5 text-sm font-semibold text-white shadow-sm transition hover:from-indigo-500 hover:to-violet-500 disabled:opacity-60"
       >
+        <Plus className="h-4 w-4" />
         {pending ? "Se adaugă..." : "Adaugă cameră"}
       </button>
       {state?.error && <p className="w-full text-sm text-red-600">{state.error}</p>}

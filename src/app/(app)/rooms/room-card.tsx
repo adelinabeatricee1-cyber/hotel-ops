@@ -1,9 +1,10 @@
 "use client";
 
 import { useTransition } from "react";
+import { Trash2 } from "lucide-react";
 import type { Room, RoomStatus } from "@/types/database";
 import { deleteRoom, setRoomStatus } from "./actions";
-import { ROOM_STATUS_LABELS, RoomStatusBadge } from "./status-badge";
+import { ROOM_STATUS_BORDER, ROOM_STATUS_LABELS, RoomStatusBadge } from "./status-badge";
 
 const STATUS_ORDER: RoomStatus[] = ["clean", "dirty", "inprogress", "blocked"];
 
@@ -20,10 +21,12 @@ export function RoomCard({ room }: { room: Room }) {
   }
 
   return (
-    <div className="rounded-lg border border-slate-200 bg-white p-4 shadow-sm">
+    <div
+      className={`rounded-xl border border-slate-100 border-t-4 bg-white p-4 shadow-sm transition hover:shadow-md ${ROOM_STATUS_BORDER[room.status]}`}
+    >
       <div className="flex items-start justify-between">
         <div>
-          <p className="text-lg font-semibold text-slate-900">Camera {room.number}</p>
+          <p className="text-lg font-bold text-slate-900">Camera {room.number}</p>
           <p className="text-xs text-slate-500">
             {room.type ? `${room.type} · ` : ""}
             {room.floor !== null ? `Etaj ${room.floor}` : "Fără etaj"}
@@ -39,7 +42,7 @@ export function RoomCard({ room }: { room: Room }) {
             type="button"
             disabled={isPending || status === room.status}
             onClick={() => handleStatusChange(status)}
-            className="rounded-md border border-slate-200 px-2 py-1 text-xs font-medium text-slate-600 hover:bg-slate-100 disabled:cursor-not-allowed disabled:opacity-40"
+            className="rounded-md border border-slate-200 px-2 py-1 text-xs font-medium text-slate-600 transition hover:border-indigo-300 hover:bg-indigo-50 hover:text-indigo-700 disabled:cursor-not-allowed disabled:opacity-40 disabled:hover:border-slate-200 disabled:hover:bg-transparent disabled:hover:text-slate-600"
           >
             {ROOM_STATUS_LABELS[status]}
           </button>
@@ -50,8 +53,9 @@ export function RoomCard({ room }: { room: Room }) {
         type="button"
         onClick={handleDelete}
         disabled={isPending}
-        className="mt-3 text-xs text-red-600 hover:underline disabled:opacity-40"
+        className="mt-3 inline-flex items-center gap-1 text-xs font-medium text-red-500 hover:text-red-600 disabled:opacity-40"
       >
+        <Trash2 className="h-3 w-3" />
         Șterge camera
       </button>
     </div>

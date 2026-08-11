@@ -1,6 +1,7 @@
 "use client";
 
 import { useActionState, useEffect, useRef } from "react";
+import { Plus } from "lucide-react";
 import { createStaff } from "./actions";
 
 export function AddStaffForm() {
@@ -24,7 +25,7 @@ export function AddStaffForm() {
           name="name"
           required
           placeholder="Maria Ionescu"
-          className="mt-1 w-48 rounded-md border border-slate-300 px-2 py-1.5 text-sm"
+          className="mt-1 w-48 rounded-lg border border-slate-300 px-2 py-1.5 text-sm shadow-sm focus:border-indigo-500 focus:outline-none focus:ring-2 focus:ring-indigo-500/20"
         />
       </div>
       <div>
@@ -35,7 +36,7 @@ export function AddStaffForm() {
           id="role"
           name="role"
           placeholder="Camerista"
-          className="mt-1 w-36 rounded-md border border-slate-300 px-2 py-1.5 text-sm"
+          className="mt-1 w-36 rounded-lg border border-slate-300 px-2 py-1.5 text-sm shadow-sm focus:border-indigo-500 focus:outline-none focus:ring-2 focus:ring-indigo-500/20"
         />
       </div>
       <div>
@@ -46,14 +47,15 @@ export function AddStaffForm() {
           id="phone"
           name="phone"
           placeholder="07xx xxx xxx"
-          className="mt-1 w-36 rounded-md border border-slate-300 px-2 py-1.5 text-sm"
+          className="mt-1 w-36 rounded-lg border border-slate-300 px-2 py-1.5 text-sm shadow-sm focus:border-indigo-500 focus:outline-none focus:ring-2 focus:ring-indigo-500/20"
         />
       </div>
       <button
         type="submit"
         disabled={pending}
-        className="rounded-md bg-slate-900 px-3 py-1.5 text-sm font-medium text-white hover:bg-slate-800 disabled:opacity-60"
+        className="inline-flex items-center gap-1.5 rounded-lg bg-gradient-to-r from-indigo-600 to-violet-600 px-3 py-1.5 text-sm font-semibold text-white shadow-sm transition hover:from-indigo-500 hover:to-violet-500 disabled:opacity-60"
       >
+        <Plus className="h-4 w-4" />
         {pending ? "Se adaugă..." : "Adaugă"}
       </button>
       {state?.error && <p className="w-full text-sm text-red-600">{state.error}</p>}

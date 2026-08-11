@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { DoorOpen } from "lucide-react";
 import { createClient } from "@/lib/supabase/server";
 import type { Room, RoomStatus } from "@/types/database";
 import { AddRoomForm } from "./add-room-form";
@@ -24,11 +25,14 @@ export default async function RoomsPage({
 
   return (
     <div>
-      <div className="flex items-center justify-between">
-        <h1 className="text-2xl font-semibold text-slate-900">Camere</h1>
+      <div className="flex items-center gap-2.5">
+        <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-indigo-100 text-indigo-600">
+          <DoorOpen className="h-5 w-5" />
+        </div>
+        <h1 className="text-2xl font-bold text-slate-900">Camere</h1>
       </div>
 
-      <div className="mt-4 rounded-lg border border-slate-200 bg-white p-4">
+      <div className="mt-5 rounded-xl border border-slate-100 bg-white p-4 shadow-sm">
         <AddRoomForm />
       </div>
 
@@ -70,8 +74,10 @@ function FilterLink({
   return (
     <Link
       href={status ? `/rooms?status=${status}` : "/rooms"}
-      className={`rounded-full px-3 py-1 text-xs font-medium ${
-        active ? "bg-slate-900 text-white" : "bg-white text-slate-600 border border-slate-200"
+      className={`rounded-full px-3 py-1 text-xs font-semibold transition ${
+        active
+          ? "bg-gradient-to-r from-indigo-600 to-violet-600 text-white shadow-sm"
+          : "border border-slate-200 bg-white text-slate-600 hover:border-indigo-300 hover:text-indigo-700"
       }`}
     >
       {children}

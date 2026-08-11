@@ -1,6 +1,7 @@
 "use client";
 
 import { useActionState, useEffect, useRef } from "react";
+import { Plus } from "lucide-react";
 import type { Room, Staff } from "@/types/database";
 import { createTask } from "./actions";
 
@@ -24,7 +25,7 @@ export function CreateTaskForm({ rooms, staff }: { rooms: Room[]; staff: Staff[]
           id="room_id"
           name="room_id"
           required
-          className="mt-1 w-32 rounded-md border border-slate-300 px-2 py-1.5 text-sm"
+          className="mt-1 w-32 rounded-lg border border-slate-300 px-2 py-1.5 text-sm shadow-sm focus:border-indigo-500 focus:outline-none focus:ring-2 focus:ring-indigo-500/20"
         >
           <option value="">Alege...</option>
           {rooms.map((room) => (
@@ -41,7 +42,7 @@ export function CreateTaskForm({ rooms, staff }: { rooms: Room[]; staff: Staff[]
         <select
           id="type"
           name="type"
-          className="mt-1 w-36 rounded-md border border-slate-300 px-2 py-1.5 text-sm"
+          className="mt-1 w-36 rounded-lg border border-slate-300 px-2 py-1.5 text-sm shadow-sm focus:border-indigo-500 focus:outline-none focus:ring-2 focus:ring-indigo-500/20"
         >
           <option value="housekeeping">Housekeeping</option>
           <option value="maintenance">Mentenanță</option>
@@ -54,7 +55,7 @@ export function CreateTaskForm({ rooms, staff }: { rooms: Room[]; staff: Staff[]
         <select
           id="assigned_to"
           name="assigned_to"
-          className="mt-1 w-40 rounded-md border border-slate-300 px-2 py-1.5 text-sm"
+          className="mt-1 w-40 rounded-lg border border-slate-300 px-2 py-1.5 text-sm shadow-sm focus:border-indigo-500 focus:outline-none focus:ring-2 focus:ring-indigo-500/20"
         >
           <option value="">Neasignat</option>
           {staff.map((member) => (
@@ -72,14 +73,15 @@ export function CreateTaskForm({ rooms, staff }: { rooms: Room[]; staff: Staff[]
           id="notes"
           name="notes"
           placeholder="Opțional"
-          className="mt-1 w-full rounded-md border border-slate-300 px-2 py-1.5 text-sm"
+          className="mt-1 w-full rounded-lg border border-slate-300 px-2 py-1.5 text-sm shadow-sm focus:border-indigo-500 focus:outline-none focus:ring-2 focus:ring-indigo-500/20"
         />
       </div>
       <button
         type="submit"
         disabled={pending}
-        className="rounded-md bg-slate-900 px-3 py-1.5 text-sm font-medium text-white hover:bg-slate-800 disabled:opacity-60"
+        className="inline-flex items-center gap-1.5 rounded-lg bg-gradient-to-r from-indigo-600 to-violet-600 px-3 py-1.5 text-sm font-semibold text-white shadow-sm transition hover:from-indigo-500 hover:to-violet-500 disabled:opacity-60"
       >
+        <Plus className="h-4 w-4" />
         {pending ? "Se creează..." : "Creează task"}
       </button>
       {state?.error && <p className="w-full text-sm text-red-600">{state.error}</p>}
