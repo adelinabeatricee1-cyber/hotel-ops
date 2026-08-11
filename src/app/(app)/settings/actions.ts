@@ -14,6 +14,7 @@ export async function updateGuestSettings(
   const wifiNetwork = String(formData.get("wifi_network") ?? "").trim();
   const wifiPassword = String(formData.get("wifi_password") ?? "").trim();
   const receptionPhone = String(formData.get("reception_phone") ?? "").trim();
+  const coverImageUrl = String(formData.get("cover_image_url") ?? "").trim();
 
   const { error } = await supabase
     .from("hotels")
@@ -21,6 +22,7 @@ export async function updateGuestSettings(
       wifi_network: wifiNetwork || null,
       wifi_password: wifiPassword || null,
       reception_phone: receptionPhone || null,
+      cover_image_url: coverImageUrl || null,
     })
     .eq("id", profile.hotel_id);
 

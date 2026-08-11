@@ -9,6 +9,8 @@ import {
   MessageSquareWarning,
   Receipt,
   Check,
+  Copy,
+  CalendarClock,
 } from "lucide-react";
 import { requestHousekeeping, requestParking, submitFeedback } from "./actions";
 import { PAYMENT_STATUS_LABELS, PAYMENT_STATUS_STYLES } from "@/app/(app)/bookings/labels";
@@ -37,6 +39,49 @@ function ActionCard({
         </div>
       </div>
       {children && <div className="mt-4">{children}</div>}
+    </div>
+  );
+}
+
+function daysBetween(a: Date, b: Date) {
+  const ms = new Date(b.toDateString()).getTime() - new Date(a.toDateString()).getTime();
+  return Math.round(ms / (1000 * 60 * 60 * 24));
+}
+
+function TodayBanner({ checkin, checkout }: { checkin: string; checkout: string }) {
+  const today = new Date();
+  const checkinDate = new Date(`${checkin}T00:00:00`);
+  const checkoutDate = new Date(`${checkout}T00:00:00`);
+
+  const untilCheckin = daysBetween(today, checkinDate);
+  const untilCheckout = daysBetween(today, checkoutDate);
+
+  const dateLabel = (d: Date) => d.toLocaleDateString("ro-RO", { day: "numeric", month: "long" });
+
+  let message: string;
+  if (untilCheckin > 0) {
+    message =
+      untilCheckin === 1
+        ? `Te așteptăm mâine, ${dateLabel(checkinDate)}. Check-in de la ora 14:00.`
+        : `Te așteptăm pe ${dateLabel(checkinDate)}. Check-in de la ora 14:00.`;
+  } else if (untilCheckout > 0) {
+    message =
+      untilCheckout === 1
+        ? `Sejur plăcut! Checkout mâine, ${dateLabel(checkoutDate)}, până la ora 11:00.`
+        : `Sejur plăcut! Mai ai ${untilCheckout} nopți — checkout pe ${dateLabel(checkoutDate)}.`;
+  } else if (untilCheckout === 0) {
+    message = "Astăzi este ziua de checkout — până la ora 11:00. Sperăm să te revedem curând!";
+  } else {
+    message = "Sperăm că ai avut un sejur plăcut!";
+  }
+
+  return (
+    <div className="mt-4 flex items-start gap-3 rounded-2xl bg-[#f3ead9] p-4 text-[#5a4a2f]">
+      <CalendarClock className="mt-0.5 h-5 w-5 shrink-0" />
+      <div>
+        <p className="text-sm font-semibold">Pentru tine astăzi</p>
+        <p className="mt-0.5 text-sm">{message}</p>
+      </div>
     </div>
   );
 }
@@ -180,20 +225,38 @@ function FeedbackCard({ token }: { token: string }) {
   );
 }
 
+function CopyField({ label, value }: { label: string; value: string }) {
+  const [copied, setCopied] = useState(false);
+
+  function handleCopy() {
+    navigator.clipboard.writeText(value);
+    setCopied(true);
+    setTimeout(() => setCopied(false), 1500);
+  }
+
+  return (
+    <div className="flex items-center justify-between gap-2">
+      <p>
+        {label}: <span className="font-semibold text-stone-900">{value}</span>
+      </p>
+      <button
+        type="button"
+        onClick={handleCopy}
+        className="inline-flex shrink-0 items-center gap-1 rounded-md border border-stone-200 px-2 py-1 text-xs font-medium text-stone-600 hover:border-[#7a2540] hover:text-[#7a2540]"
+      >
+        {copied ? <Check className="h-3 w-3" /> : <Copy className="h-3 w-3" />}
+        {copied ? "Copiat" : "Copiază"}
+      </button>
+    </div>
+  );
+}
+
 function WifiCard({ network, password }: { network: string | null; password: string | null }) {
   return (
     <ActionCard icon={<Wifi className="h-5 w-5" />} title="Wi-Fi" subtitle="Acces gratuit pe durata sejurului">
-      <div className="space-y-1 text-sm text-stone-700">
-        {network && (
-          <p>
-            Rețea: <span className="font-semibold text-stone-900">{network}</span>
-          </p>
-        )}
-        {password && (
-          <p>
-            Parolă: <span className="font-semibold text-stone-900">{password}</span>
-          </p>
-        )}
+      <div className="space-y-2 text-sm text-stone-700">
+        {network && <CopyField label="Rețea" value={network} />}
+        {password && <CopyField label="Parolă" value={password} />}
       </div>
     </ActionCard>
   );
@@ -292,6 +355,7 @@ export function GuestPortal({
   wifiPassword,
   receptionPhone,
   parkingLabel,
+  coverImageUrl,
 }: {
   token: string;
   guestName: string;
@@ -307,15 +371,36 @@ export function GuestPortal({
   wifiPassword: string | null;
   receptionPhone: string | null;
   parkingLabel: string | null;
+  coverImageUrl: string | null;
 }) {
   return (
     <div className="mx-auto max-w-2xl">
-      <div className="rounded-2xl bg-gradient-to-br from-[#7a2540] to-[#4a1526] p-6 text-white print:rounded-none">
-        <p className="text-sm text-white/70">{hotelName}</p>
-        <h1 className="mt-1 text-2xl font-bold">Bun venit, {guestName}!</h1>
-        <p className="mt-1 text-sm text-white/80">
-          Tot ce ai nevoie pentru sejurul tău, într-un singur loc.
-        </p>
+      <div
+        className="relative overflow-hidden rounded-2xl p-6 text-white print:rounded-none"
+        style={
+          coverImageUrl
+            ? { backgroundImage: `url(${coverImageUrl})`, backgroundSize: "cover", backgroundPosition: "center" }
+            : undefined
+        }
+      >
+        <div
+          className={
+            coverImageUrl
+              ? "absolute inset-0 bg-gradient-to-br from-[#4a1526]/85 to-[#4a1526]/70"
+              : "absolute inset-0 bg-gradient-to-br from-[#7a2540] to-[#4a1526]"
+          }
+        />
+        <div className="relative">
+          <p className="text-sm text-white/70">{hotelName}</p>
+          <h1 className="mt-1 text-2xl font-bold">Bun venit, {guestName}!</h1>
+          <p className="mt-1 text-sm text-white/80">
+            Tot ce ai nevoie pentru sejurul tău, într-un singur loc.
+          </p>
+        </div>
+      </div>
+
+      <div className="print:hidden">
+        <TodayBanner checkin={checkin} checkout={checkout} />
       </div>
 
       <div className="mt-4 grid grid-cols-1 gap-4 sm:grid-cols-2 print:hidden">

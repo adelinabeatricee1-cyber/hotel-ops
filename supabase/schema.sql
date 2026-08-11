@@ -498,6 +498,7 @@ grant execute on function get_booking_by_token(uuid) to anon, authenticated;
 alter table hotels add column if not exists wifi_network text;
 alter table hotels add column if not exists wifi_password text;
 alter table hotels add column if not exists reception_phone text;
+alter table hotels add column if not exists cover_image_url text;
 
 create or replace function get_booking_by_token(p_token uuid)
 returns table (
@@ -513,7 +514,8 @@ returns table (
   wifi_network text,
   wifi_password text,
   reception_phone text,
-  parking_label text
+  parking_label text,
+  cover_image_url text
 )
 language plpgsql
 security definer
@@ -527,7 +529,8 @@ begin
            (select p.label from parking_spots p
               where p.hotel_id = b.hotel_id and p.guest_name = b.guest_name
                 and p.status = 'occupied'
-              limit 1)
+              limit 1),
+           h.cover_image_url
     from bookings b
     left join rooms r on r.id = b.room_id
     join hotels h on h.id = b.hotel_id

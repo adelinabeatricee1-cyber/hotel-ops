@@ -18,6 +18,7 @@ interface BookingLookup {
   wifi_password: string | null;
   reception_phone: string | null;
   parking_label: string | null;
+  cover_image_url: string | null;
 }
 
 export default async function MyBookingPage({
@@ -66,6 +67,7 @@ export default async function MyBookingPage({
         wifiPassword={booking.wifi_password}
         receptionPhone={booking.reception_phone}
         parkingLabel={booking.parking_label}
+        coverImageUrl={booking.cover_image_url}
       />
     </div>
   );

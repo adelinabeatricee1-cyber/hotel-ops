@@ -14,6 +14,7 @@ export interface Hotel {
   wifi_network: string | null;
   wifi_password: string | null;
   reception_phone: string | null;
+  cover_image_url: string | null;
   created_at: string;
 }
 
