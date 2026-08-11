@@ -9,6 +9,7 @@ export type StaffRole = "admin" | "manager" | "staff";
 export interface Hotel {
   id: string;
   name: string;
+  monthly_revenue_target: number | null;
   created_at: string;
 }
 

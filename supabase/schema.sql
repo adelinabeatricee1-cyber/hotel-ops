@@ -418,3 +418,10 @@ create trigger trg_booking_paid
 -- ---------------------------------------------------------------------------
 
 alter table bookings add column if not exists external_booking_id text;
+
+-- ---------------------------------------------------------------------------
+-- Monthly revenue target (single reusable goal, tracked against each
+-- month's actual revenue on the Reports page).
+-- ---------------------------------------------------------------------------
+
+alter table hotels add column if not exists monthly_revenue_target numeric(10, 2);

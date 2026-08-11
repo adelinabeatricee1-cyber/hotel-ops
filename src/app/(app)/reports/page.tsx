@@ -5,6 +5,7 @@ import { requireAdmin } from "@/lib/current-user";
 import { resolveMonth } from "@/lib/date-utils";
 import type { BookingSource } from "@/types/database";
 import { SOURCE_LABELS } from "../bookings/labels";
+import { TargetCard } from "./target-card";
 
 interface BookingSlim {
   checkin: string;
@@ -21,7 +22,7 @@ export default async function ReportsPage({
 }: {
   searchParams: Promise<{ month?: string }>;
 }) {
-  await requireAdmin();
+  const { hotel } = await requireAdmin();
   const { month } = await searchParams;
   const range = resolveMonth(month);
   const supabase = await createClient();
@@ -128,6 +129,8 @@ export default async function ReportsPage({
           <p className="text-xs text-slate-500">Rest de încasat (RON)</p>
         </div>
       </div>
+
+      <TargetCard target={hotel.monthly_revenue_target} revenue={totalRevenue} />
 
       <div className="mt-6 rounded-xl border border-slate-100 bg-white p-4 shadow-sm">
         <h2 className="text-sm font-semibold text-slate-700">Rezervări pe sursă</h2>
