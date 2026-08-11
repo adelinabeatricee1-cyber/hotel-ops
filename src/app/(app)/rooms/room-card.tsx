@@ -1,18 +1,24 @@
 "use client";
 
-import { useTransition } from "react";
+import { useState, useTransition } from "react";
 import { Trash2 } from "lucide-react";
 import type { Room, RoomStatus } from "@/types/database";
-import { deleteRoom, setRoomStatus } from "./actions";
+import { deleteRoom, setNightlyRate, setRoomStatus } from "./actions";
 import { ROOM_STATUS_BORDER, ROOM_STATUS_LABELS, RoomStatusBadge } from "./status-badge";
 
 const STATUS_ORDER: RoomStatus[] = ["clean", "dirty", "inprogress", "blocked"];
 
 export function RoomCard({ room }: { room: Room }) {
   const [isPending, startTransition] = useTransition();
+  const [rate, setRate] = useState(room.nightly_rate !== null ? String(room.nightly_rate) : "");
 
   function handleStatusChange(status: RoomStatus) {
     startTransition(() => setRoomStatus(room.id, status));
+  }
+
+  function handleRateBlur() {
+    const value = rate.trim() ? Number(rate) : null;
+    startTransition(() => setNightlyRate(room.id, value));
   }
 
   function handleDelete() {
@@ -47,6 +53,24 @@ export function RoomCard({ room }: { room: Room }) {
             {ROOM_STATUS_LABELS[status]}
           </button>
         ))}
+      </div>
+
+      <div className="mt-3 flex items-center gap-1.5">
+        <label htmlFor={`rate-${room.id}`} className="text-xs text-slate-500">
+          Preț/noapte:
+        </label>
+        <input
+          id={`rate-${room.id}`}
+          type="number"
+          min="0"
+          step="0.01"
+          value={rate}
+          onChange={(e) => setRate(e.target.value)}
+          onBlur={handleRateBlur}
+          placeholder="—"
+          className="w-20 rounded border border-slate-300 px-1.5 py-0.5 text-xs"
+        />
+        <span className="text-xs text-slate-500">RON</span>
       </div>
 
       <button

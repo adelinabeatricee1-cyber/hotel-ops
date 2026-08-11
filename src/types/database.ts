@@ -15,6 +15,7 @@ export interface Hotel {
   wifi_password: string | null;
   reception_phone: string | null;
   cover_image_url: string | null;
+  booking_slug: string | null;
   created_at: string;
 }
 
@@ -33,6 +34,7 @@ export interface Room {
   floor: number | null;
   type: string | null;
   status: RoomStatus;
+  nightly_rate: number | null;
   created_at: string;
 }
 

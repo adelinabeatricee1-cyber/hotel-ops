@@ -12,6 +12,7 @@ export async function createRoom(_prevState: { error?: string } | undefined, for
   const number = String(formData.get("number") ?? "").trim();
   const floorRaw = String(formData.get("floor") ?? "").trim();
   const type = String(formData.get("type") ?? "").trim();
+  const rateRaw = String(formData.get("nightly_rate") ?? "").trim();
 
   if (!number) {
     return { error: "Numărul camerei este obligatoriu." };
@@ -22,6 +23,7 @@ export async function createRoom(_prevState: { error?: string } | undefined, for
     number,
     floor: floorRaw ? Number(floorRaw) : null,
     type: type || null,
+    nightly_rate: rateRaw ? Number(rateRaw) : null,
   });
 
   if (error) {
@@ -44,6 +46,17 @@ export async function setRoomStatus(roomId: string, status: RoomStatus) {
 
   revalidatePath("/rooms");
   revalidatePath("/");
+}
+
+export async function setNightlyRate(roomId: string, rate: number | null) {
+  const supabase = await createClient();
+  const { error } = await supabase.from("rooms").update({ nightly_rate: rate }).eq("id", roomId);
+
+  if (error) {
+    throw new Error(error.message);
+  }
+
+  revalidatePath("/rooms");
 }
 
 export async function deleteRoom(roomId: string) {

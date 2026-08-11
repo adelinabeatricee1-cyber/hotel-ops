@@ -51,6 +51,20 @@ export function AddRoomForm() {
           className="mt-1 w-36 rounded-lg border border-slate-300 px-2 py-1.5 text-sm shadow-sm focus:border-olive-500 focus:outline-none focus:ring-2 focus:ring-olive-500/20"
         />
       </div>
+      <div>
+        <label htmlFor="nightly_rate" className="block text-xs font-medium text-slate-600">
+          Preț/noapte (RON)
+        </label>
+        <input
+          id="nightly_rate"
+          name="nightly_rate"
+          type="number"
+          min="0"
+          step="0.01"
+          placeholder="opțional"
+          className="mt-1 w-32 rounded-lg border border-slate-300 px-2 py-1.5 text-sm shadow-sm focus:border-olive-500 focus:outline-none focus:ring-2 focus:ring-olive-500/20"
+        />
+      </div>
       <button
         type="submit"
         disabled={pending}

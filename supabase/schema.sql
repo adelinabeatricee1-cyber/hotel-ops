@@ -489,6 +489,125 @@ $$;
 grant execute on function get_booking_by_token(uuid) to anon, authenticated;
 
 -- ---------------------------------------------------------------------------
+-- Direct booking: a public page where guests book straight from the hotel,
+-- no OTA commission. Rooms need a nightly_rate to be bookable online, and
+-- the hotel needs a booking_slug set (Settings) to expose the page.
+-- ---------------------------------------------------------------------------
+
+alter table rooms add column if not exists nightly_rate numeric(10, 2);
+
+alter table hotels add column if not exists booking_slug text unique;
+alter table hotels drop constraint if exists hotels_booking_slug_format;
+alter table hotels add constraint hotels_booking_slug_format
+  check (booking_slug is null or booking_slug ~ '^[a-z0-9-]+$');
+
+create or replace function get_hotel_public_info(p_slug text)
+returns table (hotel_id uuid, hotel_name text, cover_image_url text)
+language sql
+security definer
+stable
+set search_path = public
+as $$
+  select id, name, cover_image_url from hotels where booking_slug = p_slug;
+$$;
+
+grant execute on function get_hotel_public_info(text) to anon, authenticated;
+
+create or replace function get_available_rooms(p_slug text, p_checkin date, p_checkout date)
+returns table (room_id uuid, number text, type text, nightly_rate numeric)
+language plpgsql
+security definer
+stable
+set search_path = public
+as $$
+declare
+  v_hotel_id uuid;
+begin
+  select id into v_hotel_id from hotels where booking_slug = p_slug;
+
+  if v_hotel_id is null then
+    return;
+  end if;
+
+  return query
+    select r.id, r.number, r.type, r.nightly_rate
+    from rooms r
+    where r.hotel_id = v_hotel_id
+      and r.nightly_rate is not null
+      and not exists (
+        select 1 from bookings b
+        where b.room_id = r.id
+          and b.status <> 'cancelled'
+          and b.checkin < p_checkout
+          and b.checkout > p_checkin
+      )
+    order by r.nightly_rate;
+end;
+$$;
+
+grant execute on function get_available_rooms(text, date, date) to anon, authenticated;
+
+create or replace function create_direct_booking(
+  p_slug text,
+  p_room_id uuid,
+  p_checkin date,
+  p_checkout date,
+  p_guest_name text,
+  p_phone text
+)
+returns uuid
+language plpgsql
+security definer
+set search_path = public
+as $$
+declare
+  v_hotel_id uuid;
+  v_rate numeric;
+  v_nights int;
+  v_token uuid;
+begin
+  if p_checkout <= p_checkin then
+    raise exception 'invalid dates';
+  end if;
+
+  if coalesce(trim(p_guest_name), '') = '' then
+    raise exception 'guest name required';
+  end if;
+
+  select id into v_hotel_id from hotels where booking_slug = p_slug;
+  if v_hotel_id is null then
+    raise exception 'invalid hotel';
+  end if;
+
+  select nightly_rate into v_rate from rooms
+    where id = p_room_id and hotel_id = v_hotel_id;
+  if v_rate is null then
+    raise exception 'room not bookable';
+  end if;
+
+  if exists (
+    select 1 from bookings b
+    where b.room_id = p_room_id
+      and b.status <> 'cancelled'
+      and b.checkin < p_checkout
+      and b.checkout > p_checkin
+  ) then
+    raise exception 'room no longer available for these dates';
+  end if;
+
+  v_nights := p_checkout - p_checkin;
+
+  insert into bookings (hotel_id, room_id, guest_name, phone, checkin, checkout, source, status, price)
+  values (v_hotel_id, p_room_id, trim(p_guest_name), nullif(trim(p_phone), ''), p_checkin, p_checkout, 'direct', 'confirmed', v_rate * v_nights)
+  returning guest_access_token into v_token;
+
+  return v_token;
+end;
+$$;
+
+grant execute on function create_direct_booking(text, uuid, date, date, text, text) to anon, authenticated;
+
+-- ---------------------------------------------------------------------------
 -- Guest portal v2: hotel-wide guest info (Wi-Fi, reception contact) plus
 -- token-scoped actions a guest can trigger without an account. Each RPC
 -- re-derives hotel_id/room_id from the booking's token server-side, so a

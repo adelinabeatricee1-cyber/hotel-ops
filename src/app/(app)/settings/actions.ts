@@ -15,6 +15,20 @@ export async function updateGuestSettings(
   const wifiPassword = String(formData.get("wifi_password") ?? "").trim();
   const receptionPhone = String(formData.get("reception_phone") ?? "").trim();
   const coverImageUrl = String(formData.get("cover_image_url") ?? "").trim();
+  const bookingSlugRaw = String(formData.get("booking_slug") ?? "").trim();
+
+  const bookingSlug = bookingSlugRaw
+    ? bookingSlugRaw
+        .toLowerCase()
+        .normalize("NFD")
+        .replace(/[̀-ͯ]/g, "")
+        .replace(/[^a-z0-9]+/g, "-")
+        .replace(/^-+|-+$/g, "")
+    : "";
+
+  if (bookingSlugRaw && !bookingSlug) {
+    return { error: "Adresa paginii de rezervare nu poate fi goală după curățare." };
+  }
 
   const { error } = await supabase
     .from("hotels")
@@ -23,11 +37,14 @@ export async function updateGuestSettings(
       wifi_password: wifiPassword || null,
       reception_phone: receptionPhone || null,
       cover_image_url: coverImageUrl || null,
+      booking_slug: bookingSlug || null,
     })
     .eq("id", profile.hotel_id);
 
   if (error) {
-    return { error: error.message };
+    return {
+      error: error.code === "23505" ? "Această adresă este deja folosită de alt hotel." : error.message,
+    };
   }
 
   revalidatePath("/settings");

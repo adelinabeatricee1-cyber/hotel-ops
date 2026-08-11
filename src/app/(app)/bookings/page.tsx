@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { CalendarDays, LayoutGrid } from "lucide-react";
+import { CalendarDays, LayoutGrid, ExternalLink } from "lucide-react";
 import { createClient } from "@/lib/supabase/server";
 import { requireAdmin } from "@/lib/current-user";
 import type { BookingWithRoom, Guest, Room } from "@/types/database";
@@ -7,7 +7,7 @@ import { BookingRow } from "./booking-row";
 import { CreateBookingForm } from "./create-booking-form";
 
 export default async function BookingsPage() {
-  await requireAdmin();
+  const { hotel } = await requireAdmin();
   const supabase = await createClient();
 
   const [{ data: bookings }, { data: rooms }, { data: guests }] = await Promise.all([
@@ -29,13 +29,26 @@ export default async function BookingsPage() {
           </div>
           <h1 className="text-2xl font-bold text-slate-900">Rezervări</h1>
         </div>
-        <Link
-          href="/bookings/calendar"
-          className="inline-flex items-center gap-1.5 rounded-lg border border-slate-200 bg-white px-3 py-1.5 text-sm font-medium text-slate-600 shadow-sm hover:border-olive-300 hover:text-olive-800"
-        >
-          <LayoutGrid className="h-4 w-4" />
-          Vezi calendar
-        </Link>
+        <div className="flex items-center gap-2">
+          {hotel.booking_slug && (
+            <a
+              href={`/book/${hotel.booking_slug}`}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-flex items-center gap-1.5 rounded-lg border border-slate-200 bg-white px-3 py-1.5 text-sm font-medium text-slate-600 shadow-sm hover:border-olive-300 hover:text-olive-800"
+            >
+              <ExternalLink className="h-4 w-4" />
+              Pagina de rezervare directă
+            </a>
+          )}
+          <Link
+            href="/bookings/calendar"
+            className="inline-flex items-center gap-1.5 rounded-lg border border-slate-200 bg-white px-3 py-1.5 text-sm font-medium text-slate-600 shadow-sm hover:border-olive-300 hover:text-olive-800"
+          >
+            <LayoutGrid className="h-4 w-4" />
+            Vezi calendar
+          </Link>
+        </div>
       </div>
 
       <div className="mt-5 rounded-xl border border-slate-100 bg-white p-4 shadow-sm">
