@@ -161,3 +161,53 @@ end;
 $$;
 
 grant execute on function create_hotel_and_profile(text, text) to authenticated;
+
+-- ---------------------------------------------------------------------------
+-- Guest billing: payment tracking + sequential invoice numbers per hotel
+-- ---------------------------------------------------------------------------
+
+alter table bookings add column if not exists payment_status text not null default 'unpaid'
+  check (payment_status in ('unpaid', 'partial', 'paid'));
+alter table bookings add column if not exists amount_paid numeric(10, 2) not null default 0;
+alter table bookings add column if not exists invoice_number int;
+alter table bookings add column if not exists invoice_issued_at timestamptz;
+
+alter table hotels add column if not exists invoice_seq int not null default 0;
+
+-- Atomically assigns the next invoice number for a hotel and stamps the
+-- booking with it. Safe to call repeatedly: returns the existing number
+-- if the booking was already invoiced instead of burning a new one.
+create or replace function issue_invoice_number(p_booking_id uuid)
+returns int
+language plpgsql
+security definer
+set search_path = public
+as $$
+declare
+  v_hotel_id uuid;
+  v_existing int;
+  v_next int;
+begin
+  select hotel_id, invoice_number into v_hotel_id, v_existing
+  from bookings where id = p_booking_id;
+
+  if v_hotel_id is null or v_hotel_id <> auth_hotel_id() then
+    raise exception 'not authorized';
+  end if;
+
+  if v_existing is not null then
+    return v_existing;
+  end if;
+
+  update hotels set invoice_seq = invoice_seq + 1
+  where id = v_hotel_id
+  returning invoice_seq into v_next;
+
+  update bookings set invoice_number = v_next, invoice_issued_at = now()
+  where id = p_booking_id;
+
+  return v_next;
+end;
+$$;
+
+grant execute on function issue_invoice_number(uuid) to authenticated;

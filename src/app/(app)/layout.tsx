@@ -1,5 +1,13 @@
 import type { ReactNode } from "react";
-import { BedDouble, LayoutDashboard, ClipboardList, Users, LogOut, DoorOpen } from "lucide-react";
+import {
+  BedDouble,
+  LayoutDashboard,
+  ClipboardList,
+  Users,
+  LogOut,
+  DoorOpen,
+  CalendarDays,
+} from "lucide-react";
 import { requireProfile } from "@/lib/current-user";
 import { logout } from "../(auth)/actions";
 import { NavLink } from "./nav-link";
@@ -9,7 +17,7 @@ export default async function AppLayout({ children }: { children: ReactNode }) {
 
   return (
     <div className="flex min-h-screen bg-slate-50">
-      <aside className="flex w-64 shrink-0 flex-col bg-gradient-to-b from-indigo-700 via-indigo-700 to-violet-800 p-4 shadow-xl">
+      <aside className="flex w-64 shrink-0 flex-col bg-gradient-to-b from-indigo-700 via-indigo-700 to-violet-800 p-4 shadow-xl print:hidden">
         <div className="flex items-center gap-2.5 px-2 pb-6">
           <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-white/15 text-white">
             <BedDouble className="h-5 w-5" />
@@ -26,6 +34,9 @@ export default async function AppLayout({ children }: { children: ReactNode }) {
           </NavLink>
           <NavLink href="/rooms" icon={<DoorOpen className="h-4 w-4" />}>
             Camere
+          </NavLink>
+          <NavLink href="/bookings" icon={<CalendarDays className="h-4 w-4" />}>
+            Rezervări
           </NavLink>
           <NavLink href="/tasks" icon={<ClipboardList className="h-4 w-4" />}>
             Housekeeping
@@ -51,7 +62,7 @@ export default async function AppLayout({ children }: { children: ReactNode }) {
         </div>
       </aside>
 
-      <main className="flex-1 p-6 md:p-8">{children}</main>
+      <main className="flex-1 p-6 md:p-8 print:p-0">{children}</main>
     </div>
   );
 }

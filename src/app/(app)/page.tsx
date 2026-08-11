@@ -1,4 +1,4 @@
-import { Sparkles, Brush, Loader, Ban, ListTodo, Hourglass } from "lucide-react";
+import { Sparkles, Brush, Loader, Ban, ListTodo, Hourglass, Wallet } from "lucide-react";
 import type { LucideIcon } from "lucide-react";
 import { createClient } from "@/lib/supabase/server";
 import { requireProfile } from "@/lib/current-user";
@@ -46,9 +46,10 @@ export default async function DashboardPage() {
   const { hotel } = await requireProfile();
   const supabase = await createClient();
 
-  const [{ data: rooms }, { data: tasks }] = await Promise.all([
+  const [{ data: rooms }, { data: tasks }, { data: unpaidBookings }] = await Promise.all([
     supabase.from("rooms").select("status"),
     supabase.from("tasks").select("status").neq("status", "done"),
+    supabase.from("bookings").select("price, amount_paid").neq("payment_status", "paid"),
   ]);
 
   const roomCounts: Record<RoomStatus, number> = { clean: 0, dirty: 0, inprogress: 0, blocked: 0 };
@@ -62,6 +63,12 @@ export default async function DashboardPage() {
   }
 
   const totalRooms = rooms?.length ?? 0;
+
+  const amountDue = (unpaidBookings ?? []).reduce(
+    (sum, b) => sum + Math.max((b.price ?? 0) - b.amount_paid, 0),
+    0,
+  );
+  const unpaidCount = unpaidBookings?.length ?? 0;
 
   return (
     <div>
@@ -108,6 +115,19 @@ export default async function DashboardPage() {
               </div>
             );
           })}
+        </div>
+      </section>
+
+      <section className="mt-8">
+        <h2 className="text-sm font-semibold text-slate-700">Plăți</h2>
+        <div className="mt-3 grid grid-cols-2 gap-4 sm:grid-cols-4">
+          <div className="rounded-xl border border-amber-100 bg-white p-4 shadow-sm">
+            <div className="inline-flex h-9 w-9 items-center justify-center rounded-lg bg-amber-100 text-amber-600">
+              <Wallet className="h-4.5 w-4.5" />
+            </div>
+            <p className="mt-3 text-2xl font-bold text-slate-900">{amountDue.toFixed(2)} RON</p>
+            <p className="text-xs text-slate-500">Rest de încasat ({unpaidCount} rezervări)</p>
+          </div>
         </div>
       </section>
     </div>

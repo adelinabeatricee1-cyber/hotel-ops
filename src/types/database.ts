@@ -3,6 +3,7 @@ export type TaskType = "housekeeping" | "maintenance";
 export type TaskStatus = "todo" | "inprogress" | "done";
 export type BookingSource = "direct" | "booking" | "expedia";
 export type BookingStatus = "confirmed" | "checked_in" | "checked_out" | "cancelled";
+export type PaymentStatus = "unpaid" | "partial" | "paid";
 export type StaffRole = "admin" | "manager" | "staff";
 
 export interface Hotel {
@@ -65,5 +66,13 @@ export interface Booking {
   source: BookingSource;
   status: BookingStatus;
   price: number | null;
+  payment_status: PaymentStatus;
+  amount_paid: number;
+  invoice_number: number | null;
+  invoice_issued_at: string | null;
   created_at: string;
+}
+
+export interface BookingWithRoom extends Booking {
+  room: Pick<Room, "id" | "number" | "floor"> | null;
 }
