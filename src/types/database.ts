@@ -5,6 +5,7 @@ export type BookingSource = "direct" | "booking" | "expedia";
 export type BookingStatus = "confirmed" | "checked_in" | "checked_out" | "cancelled";
 export type PaymentStatus = "unpaid" | "partial" | "paid";
 export type StaffRole = "admin" | "manager" | "staff";
+export type ParkingStatus = "available" | "occupied";
 
 export interface Hotel {
   id: string;
@@ -89,6 +90,16 @@ export interface Guest {
   email: string | null;
   loyalty_points: number;
   visit_count: number;
+  created_at: string;
+}
+
+export interface ParkingSpot {
+  id: string;
+  hotel_id: string;
+  label: string;
+  status: ParkingStatus;
+  guest_name: string | null;
+  notes: string | null;
   created_at: string;
 }
 

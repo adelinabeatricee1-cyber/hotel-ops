@@ -9,6 +9,7 @@ import {
   CalendarDays,
   BarChart3,
   Heart,
+  SquareParking,
 } from "lucide-react";
 import { requireProfile } from "@/lib/current-user";
 import { getDictionary } from "@/lib/i18n/get-locale";
@@ -44,6 +45,9 @@ export default async function AppLayout({ children }: { children: ReactNode }) {
           </NavLink>
           <NavLink href="/rooms" icon={<DoorOpen className="h-4 w-4" />}>
             {t.nav.rooms}
+          </NavLink>
+          <NavLink href="/parking" icon={<SquareParking className="h-4 w-4" />}>
+            {t.nav.parking}
           </NavLink>
           {canManage && (
             <NavLink href="/bookings" icon={<CalendarDays className="h-4 w-4" />}>

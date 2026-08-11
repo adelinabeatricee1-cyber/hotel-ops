@@ -9,6 +9,7 @@ export interface Dictionary {
     housekeeping: string;
     staff: string;
     reports: string;
+    parking: string;
     logout: string;
   };
   dashboard: {
@@ -56,6 +57,7 @@ export const dictionaries: Record<Locale, Dictionary> = {
       housekeeping: "Housekeeping",
       staff: "Personal",
       reports: "Rapoarte",
+      parking: "Parcare",
       logout: "Deconectare",
     },
     dashboard: {
@@ -110,6 +112,7 @@ export const dictionaries: Record<Locale, Dictionary> = {
       housekeeping: "Housekeeping",
       staff: "Staff",
       reports: "Reports",
+      parking: "Parking",
       logout: "Sign out",
     },
     dashboard: {

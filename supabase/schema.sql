@@ -425,3 +425,27 @@ alter table bookings add column if not exists external_booking_id text;
 -- ---------------------------------------------------------------------------
 
 alter table hotels add column if not exists monthly_revenue_target numeric(10, 2);
+
+-- ---------------------------------------------------------------------------
+-- Parking spots: same operational access model as rooms/tasks (everyone in
+-- the hotel can manage them, not just admin/manager).
+-- ---------------------------------------------------------------------------
+
+create table if not exists parking_spots (
+  id uuid primary key default gen_random_uuid(),
+  hotel_id uuid not null references hotels (id) on delete cascade,
+  label text not null,
+  status text not null default 'available' check (status in ('available', 'occupied')),
+  guest_name text,
+  notes text,
+  created_at timestamptz not null default now(),
+  unique (hotel_id, label)
+);
+
+create index if not exists parking_spots_hotel_id_idx on parking_spots (hotel_id);
+
+alter table parking_spots enable row level security;
+
+drop policy if exists "parking_spots: all own hotel" on parking_spots;
+create policy "parking_spots: all own hotel" on parking_spots
+  for all using (hotel_id = auth_hotel_id()) with check (hotel_id = auth_hotel_id());
