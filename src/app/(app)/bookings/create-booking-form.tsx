@@ -26,7 +26,7 @@ export function CreateBookingForm({ rooms, guests }: { rooms: Room[]; guests: Gu
           name="guest_name"
           required
           placeholder="Ion Popescu"
-          className="mt-1 w-40 rounded-lg border border-slate-300 px-2 py-1.5 text-sm shadow-sm focus:border-indigo-500 focus:outline-none focus:ring-2 focus:ring-indigo-500/20"
+          className="mt-1 w-40 rounded-lg border border-slate-300 px-2 py-1.5 text-sm shadow-sm focus:border-olive-500 focus:outline-none focus:ring-2 focus:ring-olive-500/20"
         />
       </div>
       <div>
@@ -37,7 +37,7 @@ export function CreateBookingForm({ rooms, guests }: { rooms: Room[]; guests: Gu
           id="phone"
           name="phone"
           placeholder="07xx xxx xxx"
-          className="mt-1 w-32 rounded-lg border border-slate-300 px-2 py-1.5 text-sm shadow-sm focus:border-indigo-500 focus:outline-none focus:ring-2 focus:ring-indigo-500/20"
+          className="mt-1 w-32 rounded-lg border border-slate-300 px-2 py-1.5 text-sm shadow-sm focus:border-olive-500 focus:outline-none focus:ring-2 focus:ring-olive-500/20"
         />
       </div>
       <div>
@@ -48,7 +48,7 @@ export function CreateBookingForm({ rooms, guests }: { rooms: Room[]; guests: Gu
           id="room_id"
           name="room_id"
           required
-          className="mt-1 w-28 rounded-lg border border-slate-300 px-2 py-1.5 text-sm shadow-sm focus:border-indigo-500 focus:outline-none focus:ring-2 focus:ring-indigo-500/20"
+          className="mt-1 w-28 rounded-lg border border-slate-300 px-2 py-1.5 text-sm shadow-sm focus:border-olive-500 focus:outline-none focus:ring-2 focus:ring-olive-500/20"
         >
           <option value="">Alege...</option>
           {rooms.map((room) => (
@@ -67,7 +67,7 @@ export function CreateBookingForm({ rooms, guests }: { rooms: Room[]; guests: Gu
           name="checkin"
           type="date"
           required
-          className="mt-1 rounded-lg border border-slate-300 px-2 py-1.5 text-sm shadow-sm focus:border-indigo-500 focus:outline-none focus:ring-2 focus:ring-indigo-500/20"
+          className="mt-1 rounded-lg border border-slate-300 px-2 py-1.5 text-sm shadow-sm focus:border-olive-500 focus:outline-none focus:ring-2 focus:ring-olive-500/20"
         />
       </div>
       <div>
@@ -79,7 +79,7 @@ export function CreateBookingForm({ rooms, guests }: { rooms: Room[]; guests: Gu
           name="checkout"
           type="date"
           required
-          className="mt-1 rounded-lg border border-slate-300 px-2 py-1.5 text-sm shadow-sm focus:border-indigo-500 focus:outline-none focus:ring-2 focus:ring-indigo-500/20"
+          className="mt-1 rounded-lg border border-slate-300 px-2 py-1.5 text-sm shadow-sm focus:border-olive-500 focus:outline-none focus:ring-2 focus:ring-olive-500/20"
         />
       </div>
       <div>
@@ -89,7 +89,7 @@ export function CreateBookingForm({ rooms, guests }: { rooms: Room[]; guests: Gu
         <select
           id="source"
           name="source"
-          className="mt-1 w-32 rounded-lg border border-slate-300 px-2 py-1.5 text-sm shadow-sm focus:border-indigo-500 focus:outline-none focus:ring-2 focus:ring-indigo-500/20"
+          className="mt-1 w-32 rounded-lg border border-slate-300 px-2 py-1.5 text-sm shadow-sm focus:border-olive-500 focus:outline-none focus:ring-2 focus:ring-olive-500/20"
         >
           <option value="direct">Direct</option>
           <option value="booking">Booking.com</option>
@@ -104,7 +104,7 @@ export function CreateBookingForm({ rooms, guests }: { rooms: Room[]; guests: Gu
           id="external_booking_id"
           name="external_booking_id"
           placeholder="opțional"
-          className="mt-1 w-32 rounded-lg border border-slate-300 px-2 py-1.5 text-sm shadow-sm focus:border-indigo-500 focus:outline-none focus:ring-2 focus:ring-indigo-500/20"
+          className="mt-1 w-32 rounded-lg border border-slate-300 px-2 py-1.5 text-sm shadow-sm focus:border-olive-500 focus:outline-none focus:ring-2 focus:ring-olive-500/20"
         />
       </div>
       <div>
@@ -114,7 +114,7 @@ export function CreateBookingForm({ rooms, guests }: { rooms: Room[]; guests: Gu
         <select
           id="guest_id"
           name="guest_id"
-          className="mt-1 w-40 rounded-lg border border-slate-300 px-2 py-1.5 text-sm shadow-sm focus:border-indigo-500 focus:outline-none focus:ring-2 focus:ring-indigo-500/20"
+          className="mt-1 w-40 rounded-lg border border-slate-300 px-2 py-1.5 text-sm shadow-sm focus:border-olive-500 focus:outline-none focus:ring-2 focus:ring-olive-500/20"
         >
           <option value="">Fără / ocazional</option>
           {guests.map((guest) => (
@@ -135,13 +135,13 @@ export function CreateBookingForm({ rooms, guests }: { rooms: Room[]; guests: Gu
           min="0"
           step="0.01"
           placeholder="500"
-          className="mt-1 w-24 rounded-lg border border-slate-300 px-2 py-1.5 text-sm shadow-sm focus:border-indigo-500 focus:outline-none focus:ring-2 focus:ring-indigo-500/20"
+          className="mt-1 w-24 rounded-lg border border-slate-300 px-2 py-1.5 text-sm shadow-sm focus:border-olive-500 focus:outline-none focus:ring-2 focus:ring-olive-500/20"
         />
       </div>
       <button
         type="submit"
         disabled={pending}
-        className="inline-flex items-center gap-1.5 rounded-lg bg-gradient-to-r from-indigo-600 to-violet-600 px-3 py-1.5 text-sm font-semibold text-white shadow-sm transition hover:from-indigo-500 hover:to-violet-500 disabled:opacity-60"
+        className="inline-flex items-center gap-1.5 rounded-lg bg-gradient-to-r from-olive-600 to-olive-700 px-3 py-1.5 text-sm font-semibold text-white shadow-sm transition hover:from-olive-500 hover:to-olive-600 disabled:opacity-60"
       >
         <Plus className="h-4 w-4" />
         {pending ? "Se adaugă..." : "Adaugă rezervare"}

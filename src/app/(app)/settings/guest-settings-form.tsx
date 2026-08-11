@@ -18,7 +18,7 @@ export function GuestSettingsForm({ hotel }: { hotel: Hotel }) {
           name="wifi_network"
           defaultValue={hotel.wifi_network ?? ""}
           placeholder="Hotel-Guest"
-          className="mt-1 w-full max-w-xs rounded-lg border border-slate-300 px-2 py-1.5 text-sm shadow-sm focus:border-indigo-500 focus:outline-none focus:ring-2 focus:ring-indigo-500/20"
+          className="mt-1 w-full max-w-xs rounded-lg border border-slate-300 px-2 py-1.5 text-sm shadow-sm focus:border-olive-500 focus:outline-none focus:ring-2 focus:ring-olive-500/20"
         />
       </div>
       <div>
@@ -29,7 +29,7 @@ export function GuestSettingsForm({ hotel }: { hotel: Hotel }) {
           id="wifi_password"
           name="wifi_password"
           defaultValue={hotel.wifi_password ?? ""}
-          className="mt-1 w-full max-w-xs rounded-lg border border-slate-300 px-2 py-1.5 text-sm shadow-sm focus:border-indigo-500 focus:outline-none focus:ring-2 focus:ring-indigo-500/20"
+          className="mt-1 w-full max-w-xs rounded-lg border border-slate-300 px-2 py-1.5 text-sm shadow-sm focus:border-olive-500 focus:outline-none focus:ring-2 focus:ring-olive-500/20"
         />
       </div>
       <div>
@@ -41,7 +41,7 @@ export function GuestSettingsForm({ hotel }: { hotel: Hotel }) {
           name="reception_phone"
           placeholder="40712345678"
           defaultValue={hotel.reception_phone ?? ""}
-          className="mt-1 w-full max-w-xs rounded-lg border border-slate-300 px-2 py-1.5 text-sm shadow-sm focus:border-indigo-500 focus:outline-none focus:ring-2 focus:ring-indigo-500/20"
+          className="mt-1 w-full max-w-xs rounded-lg border border-slate-300 px-2 py-1.5 text-sm shadow-sm focus:border-olive-500 focus:outline-none focus:ring-2 focus:ring-olive-500/20"
         />
         <p className="mt-1 text-xs text-slate-400">
           Fără +, spații sau zero inițial — ex. pentru 07xx xxx xxx scrie 407xxxxxxxx.
@@ -54,7 +54,7 @@ export function GuestSettingsForm({ hotel }: { hotel: Hotel }) {
       <button
         type="submit"
         disabled={pending}
-        className="rounded-lg bg-gradient-to-r from-indigo-600 to-violet-600 px-4 py-2 text-sm font-semibold text-white shadow-sm transition hover:from-indigo-500 hover:to-violet-500 disabled:opacity-60"
+        className="rounded-lg bg-gradient-to-r from-olive-600 to-olive-700 px-4 py-2 text-sm font-semibold text-white shadow-sm transition hover:from-olive-500 hover:to-olive-600 disabled:opacity-60"
       >
         {pending ? "Se salvează..." : "Salvează"}
       </button>

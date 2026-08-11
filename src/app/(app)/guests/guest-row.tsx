@@ -31,7 +31,7 @@ export function GuestRow({ guest }: { guest: Guest }) {
       <td className="py-2.5 pr-4 text-sm text-slate-600">{guest.phone || "—"}</td>
       <td className="py-2.5 pr-4 text-sm text-slate-600">{guest.email || "—"}</td>
       <td className="py-2.5 pr-4 text-sm text-slate-600">{guest.visit_count}</td>
-      <td className="py-2.5 pr-4 text-sm font-semibold text-indigo-700">
+      <td className="py-2.5 pr-4 text-sm font-semibold text-olive-800">
         {guest.loyalty_points} pct
       </td>
       <td className="py-2.5 text-right">

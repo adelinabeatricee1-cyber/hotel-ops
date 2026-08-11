@@ -25,14 +25,14 @@ export default async function AppLayout({ children }: { children: ReactNode }) {
 
   return (
     <div className="flex min-h-screen bg-slate-50">
-      <aside className="flex w-64 shrink-0 flex-col bg-gradient-to-b from-indigo-700 via-indigo-700 to-violet-800 p-4 shadow-xl print:hidden">
+      <aside className="flex w-64 shrink-0 flex-col bg-gradient-to-b from-stone-800 via-stone-800 to-stone-900 p-4 shadow-xl print:hidden">
         <div className="flex items-center gap-2.5 px-2 pb-4">
           <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-white/15 text-white">
             <BedDouble className="h-5 w-5" />
           </div>
           <div className="min-w-0">
             <p className="truncate text-sm font-semibold text-white">{hotel.name}</p>
-            <p className="text-xs text-indigo-200">Hotel Ops</p>
+            <p className="text-xs text-stone-300">Hotel Ops</p>
           </div>
         </div>
 
@@ -79,13 +79,13 @@ export default async function AppLayout({ children }: { children: ReactNode }) {
         </nav>
 
         <div className="border-t border-white/10 pt-4">
-          <p className="truncate px-2 text-xs text-indigo-200">
+          <p className="truncate px-2 text-xs text-stone-300">
             {profile.full_name || "Utilizator"}
           </p>
           <form action={logout}>
             <button
               type="submit"
-              className="mt-2 flex w-full items-center gap-2.5 rounded-lg px-2 py-1.5 text-left text-sm text-indigo-100 hover:bg-white/10 hover:text-white"
+              className="mt-2 flex w-full items-center gap-2.5 rounded-lg px-2 py-1.5 text-left text-sm text-stone-300 hover:bg-white/10 hover:text-white"
             >
               <LogOut className="h-4 w-4" />
               {t.nav.logout}

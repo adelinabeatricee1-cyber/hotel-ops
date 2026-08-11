@@ -11,14 +11,14 @@ export function SignupForm({ t, locale }: { t: Dictionary; locale: Locale }) {
   const [state, formAction, pending] = useActionState(signup, undefined);
 
   return (
-    <div className="flex min-h-screen items-center justify-center bg-gradient-to-br from-indigo-600 via-violet-600 to-fuchsia-600 px-4 py-12">
+    <div className="flex min-h-screen items-center justify-center bg-gradient-to-br from-stone-700 via-stone-800 to-olive-900 px-4 py-12">
       <div className="w-full max-w-sm">
         <div className="mb-4 flex justify-end">
           <LanguageSwitcher locale={locale} variant="light" />
         </div>
-        <div className="rounded-2xl border border-white/20 bg-white/95 p-8 shadow-2xl shadow-indigo-900/30 backdrop-blur">
+        <div className="rounded-2xl border border-white/20 bg-white/95 p-8 shadow-2xl shadow-stone-900/30 backdrop-blur">
           <div className="flex items-center gap-2.5">
-            <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-gradient-to-br from-indigo-600 to-violet-600 text-white shadow-lg shadow-indigo-600/30">
+            <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-gradient-to-br from-olive-600 to-olive-700 text-white shadow-lg shadow-olive-600/30">
               <BedDouble className="h-5 w-5" />
             </div>
             <h1 className="text-xl font-bold text-slate-900">{t.login.title}</h1>
@@ -36,7 +36,7 @@ export function SignupForm({ t, locale }: { t: Dictionary; locale: Locale }) {
                 type="text"
                 required
                 placeholder={t.signup.hotelNamePlaceholder}
-                className="mt-1.5 w-full rounded-lg border border-slate-300 px-3 py-2 text-sm shadow-sm transition focus:border-indigo-500 focus:outline-none focus:ring-2 focus:ring-indigo-500/20"
+                className="mt-1.5 w-full rounded-lg border border-slate-300 px-3 py-2 text-sm shadow-sm transition focus:border-olive-500 focus:outline-none focus:ring-2 focus:ring-olive-500/20"
               />
             </div>
             <div>
@@ -47,7 +47,7 @@ export function SignupForm({ t, locale }: { t: Dictionary; locale: Locale }) {
                 id="full_name"
                 name="full_name"
                 type="text"
-                className="mt-1.5 w-full rounded-lg border border-slate-300 px-3 py-2 text-sm shadow-sm transition focus:border-indigo-500 focus:outline-none focus:ring-2 focus:ring-indigo-500/20"
+                className="mt-1.5 w-full rounded-lg border border-slate-300 px-3 py-2 text-sm shadow-sm transition focus:border-olive-500 focus:outline-none focus:ring-2 focus:ring-olive-500/20"
               />
             </div>
             <div>
@@ -60,7 +60,7 @@ export function SignupForm({ t, locale }: { t: Dictionary; locale: Locale }) {
                 type="email"
                 required
                 autoComplete="email"
-                className="mt-1.5 w-full rounded-lg border border-slate-300 px-3 py-2 text-sm shadow-sm transition focus:border-indigo-500 focus:outline-none focus:ring-2 focus:ring-indigo-500/20"
+                className="mt-1.5 w-full rounded-lg border border-slate-300 px-3 py-2 text-sm shadow-sm transition focus:border-olive-500 focus:outline-none focus:ring-2 focus:ring-olive-500/20"
               />
             </div>
             <div>
@@ -74,7 +74,7 @@ export function SignupForm({ t, locale }: { t: Dictionary; locale: Locale }) {
                 required
                 minLength={6}
                 autoComplete="new-password"
-                className="mt-1.5 w-full rounded-lg border border-slate-300 px-3 py-2 text-sm shadow-sm transition focus:border-indigo-500 focus:outline-none focus:ring-2 focus:ring-indigo-500/20"
+                className="mt-1.5 w-full rounded-lg border border-slate-300 px-3 py-2 text-sm shadow-sm transition focus:border-olive-500 focus:outline-none focus:ring-2 focus:ring-olive-500/20"
               />
             </div>
 
@@ -83,7 +83,7 @@ export function SignupForm({ t, locale }: { t: Dictionary; locale: Locale }) {
             <button
               type="submit"
               disabled={pending}
-              className="w-full rounded-lg bg-gradient-to-r from-indigo-600 to-violet-600 px-3 py-2.5 text-sm font-semibold text-white shadow-lg shadow-indigo-600/30 transition hover:from-indigo-500 hover:to-violet-500 disabled:opacity-60"
+              className="w-full rounded-lg bg-gradient-to-r from-olive-600 to-olive-700 px-3 py-2.5 text-sm font-semibold text-white shadow-lg shadow-olive-600/30 transition hover:from-olive-500 hover:to-olive-600 disabled:opacity-60"
             >
               {pending ? t.signup.submitting : t.signup.submit}
             </button>
@@ -91,7 +91,7 @@ export function SignupForm({ t, locale }: { t: Dictionary; locale: Locale }) {
 
           <p className="mt-5 text-center text-sm text-slate-500">
             {t.signup.haveAccount}{" "}
-            <Link href="/login" className="font-semibold text-indigo-600 hover:text-indigo-500">
+            <Link href="/login" className="font-semibold text-olive-700 hover:text-olive-600">
               {t.signup.login}
             </Link>
           </p>

@@ -6,7 +6,7 @@ import type { Staff } from "@/types/database";
 import { deleteStaff } from "./actions";
 
 const AVATAR_COLORS = [
-  "bg-indigo-100 text-indigo-700",
+  "bg-olive-100 text-olive-700",
   "bg-fuchsia-100 text-fuchsia-700",
   "bg-emerald-100 text-emerald-700",
   "bg-amber-100 text-amber-700",

@@ -75,7 +75,7 @@ export default async function ReportsPage({
   return (
     <div>
       <div className="flex items-center gap-2.5">
-        <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-indigo-100 text-indigo-600">
+        <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-olive-100 text-olive-700">
           <BarChart3 className="h-5 w-5" />
         </div>
         <h1 className="text-2xl font-bold text-slate-900">Rapoarte</h1>
@@ -100,8 +100,8 @@ export default async function ReportsPage({
       </div>
 
       <div className="mt-6 grid grid-cols-2 gap-4 sm:grid-cols-4">
-        <div className="rounded-xl border border-indigo-100 bg-white p-4 shadow-sm">
-          <div className="inline-flex h-9 w-9 items-center justify-center rounded-lg bg-indigo-100 text-indigo-600">
+        <div className="rounded-xl border border-olive-100 bg-white p-4 shadow-sm">
+          <div className="inline-flex h-9 w-9 items-center justify-center rounded-lg bg-olive-100 text-olive-700">
             <Percent className="h-4.5 w-4.5" />
           </div>
           <p className="mt-3 text-2xl font-bold text-slate-900">{occupancyRate.toFixed(0)}%</p>

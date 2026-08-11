@@ -18,13 +18,13 @@ export const TASK_STATUS_ICONS: Record<TaskStatus, LucideIcon> = {
 
 export const TASK_STATUS_COLUMN_STYLE: Record<TaskStatus, string> = {
   todo: "bg-fuchsia-100 text-fuchsia-700",
-  inprogress: "bg-indigo-100 text-indigo-700",
+  inprogress: "bg-sky-100 text-sky-700",
   done: "bg-emerald-100 text-emerald-700",
 };
 
 export const TASK_STATUS_BORDER: Record<TaskStatus, string> = {
   todo: "border-t-fuchsia-400",
-  inprogress: "border-t-indigo-400",
+  inprogress: "border-t-sky-400",
   done: "border-t-emerald-400",
 };
 

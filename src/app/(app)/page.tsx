@@ -14,7 +14,7 @@ const ROOM_STATUS_META: Record<RoomStatus, { icon: LucideIcon; ring: string; ico
 
 const TASK_STATUS_META: Record<Exclude<TaskStatus, "done">, { icon: LucideIcon; iconWrap: string }> = {
   todo: { icon: ListTodo, iconWrap: "bg-fuchsia-100 text-fuchsia-600" },
-  inprogress: { icon: Hourglass, iconWrap: "bg-indigo-100 text-indigo-600" },
+  inprogress: { icon: Hourglass, iconWrap: "bg-sky-100 text-sky-700" },
 };
 
 export default async function DashboardPage() {
@@ -51,11 +51,11 @@ export default async function DashboardPage() {
 
   return (
     <div>
-      <div className="rounded-2xl bg-gradient-to-r from-indigo-600 to-violet-600 p-6 text-white shadow-lg shadow-indigo-600/20">
+      <div className="rounded-2xl bg-gradient-to-r from-olive-600 to-olive-700 p-6 text-white shadow-lg shadow-olive-600/20">
         <h1 className="text-2xl font-bold">
           {t.dashboard.welcome}, {hotel.name}
         </h1>
-        <p className="mt-1 text-sm text-indigo-100">{t.dashboard.summary}</p>
+        <p className="mt-1 text-sm text-stone-300">{t.dashboard.summary}</p>
       </div>
 
       <section className="mt-8">

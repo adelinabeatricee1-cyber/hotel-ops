@@ -17,16 +17,16 @@ export function TargetCard({
   const progress = target && target > 0 ? Math.min((revenue / target) * 100, 100) : 0;
 
   return (
-    <div className="mt-6 rounded-xl border border-indigo-100 bg-white p-4 shadow-sm">
+    <div className="mt-6 rounded-xl border border-olive-100 bg-white p-4 shadow-sm">
       <div className="flex items-center justify-between">
         <h2 className="flex items-center gap-2 text-sm font-semibold text-slate-700">
-          <Target className="h-4 w-4 text-indigo-600" />
+          <Target className="h-4 w-4 text-olive-700" />
           Target lunar de venituri
         </h2>
         <button
           type="button"
           onClick={() => setEditing((v) => !v)}
-          className="text-xs font-medium text-indigo-600 hover:text-indigo-700"
+          className="text-xs font-medium text-olive-700 hover:text-olive-800"
         >
           {editing ? "Anulează" : target ? "Editează" : "Setează target"}
         </button>
@@ -46,13 +46,13 @@ export function TargetCard({
               step="0.01"
               defaultValue={target ?? ""}
               placeholder="ex. 20000"
-              className="mt-1 w-36 rounded-lg border border-slate-300 px-2 py-1.5 text-sm shadow-sm focus:border-indigo-500 focus:outline-none focus:ring-2 focus:ring-indigo-500/20"
+              className="mt-1 w-36 rounded-lg border border-slate-300 px-2 py-1.5 text-sm shadow-sm focus:border-olive-500 focus:outline-none focus:ring-2 focus:ring-olive-500/20"
             />
           </div>
           <button
             type="submit"
             disabled={pending}
-            className="rounded-lg bg-gradient-to-r from-indigo-600 to-violet-600 px-3 py-1.5 text-sm font-semibold text-white shadow-sm transition hover:from-indigo-500 hover:to-violet-500 disabled:opacity-60"
+            className="rounded-lg bg-gradient-to-r from-olive-600 to-olive-700 px-3 py-1.5 text-sm font-semibold text-white shadow-sm transition hover:from-olive-500 hover:to-olive-600 disabled:opacity-60"
           >
             {pending ? "Se salvează..." : "Salvează"}
           </button>
@@ -68,7 +68,7 @@ export function TargetCard({
           </div>
           <div className="mt-2 h-2.5 w-full overflow-hidden rounded-full bg-slate-100">
             <div
-              className="h-full rounded-full bg-gradient-to-r from-indigo-500 to-violet-500 transition-all"
+              className="h-full rounded-full bg-gradient-to-r from-olive-500 to-olive-600 transition-all"
               style={{ width: `${progress}%` }}
             />
           </div>

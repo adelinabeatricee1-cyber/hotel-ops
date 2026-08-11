@@ -58,7 +58,7 @@ export function ParkingSpotCard({ spot }: { spot: ParkingSpot }) {
           onChange={(e) => setGuestName(e.target.value)}
           onBlur={handleGuestBlur}
           placeholder="Nume oaspete / nr. înmatriculare"
-          className="mt-3 w-full rounded-lg border border-slate-300 px-2 py-1.5 text-sm shadow-sm focus:border-indigo-500 focus:outline-none focus:ring-2 focus:ring-indigo-500/20"
+          className="mt-3 w-full rounded-lg border border-slate-300 px-2 py-1.5 text-sm shadow-sm focus:border-olive-500 focus:outline-none focus:ring-2 focus:ring-olive-500/20"
         />
       )}
 
@@ -67,7 +67,7 @@ export function ParkingSpotCard({ spot }: { spot: ParkingSpot }) {
           type="button"
           onClick={handleToggle}
           disabled={isPending}
-          className="rounded-md border border-slate-200 px-2.5 py-1 text-xs font-medium text-slate-600 transition hover:border-indigo-300 hover:bg-indigo-50 hover:text-indigo-700 disabled:opacity-40"
+          className="rounded-md border border-slate-200 px-2.5 py-1 text-xs font-medium text-slate-600 transition hover:border-olive-300 hover:bg-olive-50 hover:text-olive-800 disabled:opacity-40"
         >
           {occupied ? "Marchează liber" : "Marchează ocupat"}
         </button>

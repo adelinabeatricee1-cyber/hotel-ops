@@ -26,7 +26,7 @@ export default async function RoomsPage({
   return (
     <div>
       <div className="flex items-center gap-2.5">
-        <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-indigo-100 text-indigo-600">
+        <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-olive-100 text-olive-700">
           <DoorOpen className="h-5 w-5" />
         </div>
         <h1 className="text-2xl font-bold text-slate-900">Camere</h1>
@@ -76,8 +76,8 @@ function FilterLink({
       href={status ? `/rooms?status=${status}` : "/rooms"}
       className={`rounded-full px-3 py-1 text-xs font-semibold transition ${
         active
-          ? "bg-gradient-to-r from-indigo-600 to-violet-600 text-white shadow-sm"
-          : "border border-slate-200 bg-white text-slate-600 hover:border-indigo-300 hover:text-indigo-700"
+          ? "bg-gradient-to-r from-olive-600 to-olive-700 text-white shadow-sm"
+          : "border border-slate-200 bg-white text-slate-600 hover:border-olive-300 hover:text-olive-800"
       }`}
     >
       {children}

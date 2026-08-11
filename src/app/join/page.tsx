@@ -11,16 +11,16 @@ interface InviteInfo {
 
 function InvalidInviteCard({ message }: { message: string }) {
   return (
-    <div className="flex min-h-screen items-center justify-center bg-gradient-to-br from-indigo-600 via-violet-600 to-fuchsia-600 px-4 py-12">
-      <div className="w-full max-w-sm rounded-2xl border border-white/20 bg-white/95 p-8 text-center shadow-2xl shadow-indigo-900/30 backdrop-blur">
-        <div className="mx-auto flex h-10 w-10 items-center justify-center rounded-xl bg-gradient-to-br from-indigo-600 to-violet-600 text-white shadow-lg shadow-indigo-600/30">
+    <div className="flex min-h-screen items-center justify-center bg-gradient-to-br from-stone-700 via-stone-800 to-olive-900 px-4 py-12">
+      <div className="w-full max-w-sm rounded-2xl border border-white/20 bg-white/95 p-8 text-center shadow-2xl shadow-stone-900/30 backdrop-blur">
+        <div className="mx-auto flex h-10 w-10 items-center justify-center rounded-xl bg-gradient-to-br from-olive-600 to-olive-700 text-white shadow-lg shadow-olive-600/30">
           <BedDouble className="h-5 w-5" />
         </div>
         <h1 className="mt-3 text-lg font-bold text-slate-900">Hotel Ops</h1>
         <p className="mt-3 text-sm text-slate-600">{message}</p>
         <Link
           href="/login"
-          className="mt-5 inline-block font-semibold text-indigo-600 hover:text-indigo-500"
+          className="mt-5 inline-block font-semibold text-olive-700 hover:text-olive-600"
         >
           Mergi la autentificare
         </Link>

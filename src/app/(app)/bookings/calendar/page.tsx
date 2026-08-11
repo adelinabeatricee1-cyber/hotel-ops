@@ -52,14 +52,14 @@ export default async function BookingsCalendarPage({
     <div>
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-2.5">
-          <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-indigo-100 text-indigo-600">
+          <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-olive-100 text-olive-700">
             <CalendarDays className="h-5 w-5" />
           </div>
           <h1 className="text-2xl font-bold text-slate-900">Calendar disponibilitate</h1>
         </div>
         <Link
           href="/bookings"
-          className="inline-flex items-center gap-1.5 rounded-lg border border-slate-200 bg-white px-3 py-1.5 text-sm font-medium text-slate-600 shadow-sm hover:border-indigo-300 hover:text-indigo-700"
+          className="inline-flex items-center gap-1.5 rounded-lg border border-slate-200 bg-white px-3 py-1.5 text-sm font-medium text-slate-600 shadow-sm hover:border-olive-300 hover:text-olive-800"
         >
           <List className="h-4 w-4" />
           Vezi listă
@@ -95,7 +95,7 @@ export default async function BookingsCalendarPage({
                 <th
                   key={day}
                   className={`border-b border-slate-200 px-1.5 py-2 text-center font-medium ${
-                    isWeekend(day) ? "bg-indigo-50 text-indigo-600" : "text-slate-500"
+                    isWeekend(day) ? "bg-olive-50 text-olive-700" : "text-slate-500"
                   }`}
                 >
                   {dayOfMonthLabel(day)}
@@ -116,7 +116,7 @@ export default async function BookingsCalendarPage({
                       {booking ? (
                         <span
                           title={`${booking.guest_name} · ${booking.checkin} → ${booking.checkout}`}
-                          className="mx-auto flex h-6 w-6 items-center justify-center rounded bg-gradient-to-br from-indigo-500 to-violet-500 text-[10px] font-semibold text-white"
+                          className="mx-auto flex h-6 w-6 items-center justify-center rounded bg-gradient-to-br from-olive-500 to-olive-600 text-[10px] font-semibold text-white"
                         >
                           {booking.guest_name.trim().charAt(0).toUpperCase()}
                         </span>

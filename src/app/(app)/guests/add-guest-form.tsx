@@ -25,7 +25,7 @@ export function AddGuestForm() {
           name="name"
           required
           placeholder="Ion Popescu"
-          className="mt-1 w-48 rounded-lg border border-slate-300 px-2 py-1.5 text-sm shadow-sm focus:border-indigo-500 focus:outline-none focus:ring-2 focus:ring-indigo-500/20"
+          className="mt-1 w-48 rounded-lg border border-slate-300 px-2 py-1.5 text-sm shadow-sm focus:border-olive-500 focus:outline-none focus:ring-2 focus:ring-olive-500/20"
         />
       </div>
       <div>
@@ -36,7 +36,7 @@ export function AddGuestForm() {
           id="phone"
           name="phone"
           placeholder="07xx xxx xxx"
-          className="mt-1 w-36 rounded-lg border border-slate-300 px-2 py-1.5 text-sm shadow-sm focus:border-indigo-500 focus:outline-none focus:ring-2 focus:ring-indigo-500/20"
+          className="mt-1 w-36 rounded-lg border border-slate-300 px-2 py-1.5 text-sm shadow-sm focus:border-olive-500 focus:outline-none focus:ring-2 focus:ring-olive-500/20"
         />
       </div>
       <div>
@@ -48,13 +48,13 @@ export function AddGuestForm() {
           name="email"
           type="email"
           placeholder="nume@exemplu.ro"
-          className="mt-1 w-48 rounded-lg border border-slate-300 px-2 py-1.5 text-sm shadow-sm focus:border-indigo-500 focus:outline-none focus:ring-2 focus:ring-indigo-500/20"
+          className="mt-1 w-48 rounded-lg border border-slate-300 px-2 py-1.5 text-sm shadow-sm focus:border-olive-500 focus:outline-none focus:ring-2 focus:ring-olive-500/20"
         />
       </div>
       <button
         type="submit"
         disabled={pending}
-        className="inline-flex items-center gap-1.5 rounded-lg bg-gradient-to-r from-indigo-600 to-violet-600 px-3 py-1.5 text-sm font-semibold text-white shadow-sm transition hover:from-indigo-500 hover:to-violet-500 disabled:opacity-60"
+        className="inline-flex items-center gap-1.5 rounded-lg bg-gradient-to-r from-olive-600 to-olive-700 px-3 py-1.5 text-sm font-semibold text-white shadow-sm transition hover:from-olive-500 hover:to-olive-600 disabled:opacity-60"
       >
         <Plus className="h-4 w-4" />
         {pending ? "Se adaugă..." : "Adaugă client"}

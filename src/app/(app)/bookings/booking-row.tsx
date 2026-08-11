@@ -69,7 +69,7 @@ export function BookingRow({ booking }: { booking: BookingWithRoom }) {
                 href="https://admin.booking.com/"
                 target="_blank"
                 rel="noopener noreferrer"
-                className="ml-1.5 inline-flex items-center gap-0.5 text-indigo-600 hover:text-indigo-700"
+                className="ml-1.5 inline-flex items-center gap-0.5 text-olive-700 hover:text-olive-800"
               >
                 <ExternalLink className="h-3 w-3" />
                 extranet
@@ -92,7 +92,7 @@ export function BookingRow({ booking }: { booking: BookingWithRoom }) {
               className={`rounded-full px-2.5 py-0.5 text-xs font-medium transition disabled:cursor-default ${
                 status === booking.payment_status
                   ? PAYMENT_STATUS_STYLES[status]
-                  : "border border-slate-200 text-slate-500 hover:border-indigo-300 hover:text-indigo-700"
+                  : "border border-slate-200 text-slate-500 hover:border-olive-300 hover:text-olive-800"
               }`}
             >
               {PAYMENT_STATUS_LABELS[status]}
@@ -128,7 +128,7 @@ export function BookingRow({ booking }: { booking: BookingWithRoom }) {
           </button>
           <Link
             href={`/bookings/${booking.id}/invoice`}
-            className="inline-flex items-center gap-1 text-xs font-medium text-indigo-600 hover:text-indigo-700"
+            className="inline-flex items-center gap-1 text-xs font-medium text-olive-700 hover:text-olive-800"
           >
             <Receipt className="h-3.5 w-3.5" />
             {booking.invoice_number ? `Factura #${booking.invoice_number}` : "Generează factură"}

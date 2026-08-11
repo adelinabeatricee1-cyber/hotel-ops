@@ -11,6 +11,17 @@
   --color-foreground: var(--foreground);
   --font-sans: var(--font-geist-sans);
   --font-mono: var(--font-geist-mono);
+
+  --color-olive-50: #f6f5ec;
+  --color-olive-100: #e8e6cf;
+  --color-olive-200: #d3d1a4;
+  --color-olive-300: #b7b378;
+  --color-olive-400: #9a9757;
+  --color-olive-500: #7f7c42;
+  --color-olive-600: #676435;
+  --color-olive-700: #514f2a;
+  --color-olive-800: #3f3d21;
+  --color-olive-900: #302f19;
 }
 
 body {

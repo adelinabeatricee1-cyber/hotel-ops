@@ -20,7 +20,7 @@ export function LanguageSwitcher({
 
   const wrapClass =
     variant === "dark"
-      ? "bg-white/10 text-indigo-100"
+      ? "bg-white/10 text-stone-300"
       : "border border-slate-200 bg-white text-slate-500 shadow-sm";
   const activeClass =
     variant === "dark" ? "bg-white/20 text-white" : "bg-slate-900 text-white";

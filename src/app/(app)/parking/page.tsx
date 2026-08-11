@@ -18,7 +18,7 @@ export default async function ParkingPage() {
   return (
     <div>
       <div className="flex items-center gap-2.5">
-        <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-indigo-100 text-indigo-600">
+        <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-olive-100 text-olive-700">
           <SquareParking className="h-5 w-5" />
         </div>
         <h1 className="text-2xl font-bold text-slate-900">
