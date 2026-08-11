@@ -20,7 +20,12 @@ export async function requireProfile(): Promise<{ profile: Profile; hotel: Hotel
     .single<Profile>();
 
   if (!profile) {
-    redirect("/login");
+    // Authenticated (e.g. via an email confirmation link) but never
+    // finished signup, so there's no hotel/profile yet. Sign out instead
+    // of bouncing straight back to /login, which would just redirect here
+    // again and loop forever.
+    await supabase.auth.signOut();
+    redirect("/login?error=no-profile");
   }
 
   const { data: hotel } = await supabase
@@ -30,7 +35,8 @@ export async function requireProfile(): Promise<{ profile: Profile; hotel: Hotel
     .single<Hotel>();
 
   if (!hotel) {
-    redirect("/login");
+    await supabase.auth.signOut();
+    redirect("/login?error=no-profile");
   }
 
   return { profile, hotel };

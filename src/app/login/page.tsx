@@ -1,8 +1,21 @@
 "use client";
 
 import Link from "next/link";
-import { useActionState } from "react";
+import { useSearchParams } from "next/navigation";
+import { Suspense, useActionState } from "react";
 import { login } from "../(auth)/actions";
+
+function NoProfileBanner() {
+  const searchParams = useSearchParams();
+  if (searchParams.get("error") !== "no-profile") return null;
+
+  return (
+    <p className="mt-4 rounded-md bg-amber-50 px-3 py-2 text-sm text-amber-800">
+      Contul a fost confirmat, dar înregistrarea hotelului nu s-a finalizat. Te rugăm să creezi
+      hotelul din nou.
+    </p>
+  );
+}
 
 export default function LoginPage() {
   const [state, formAction, pending] = useActionState(login, undefined);
@@ -12,6 +25,10 @@ export default function LoginPage() {
       <div className="w-full max-w-sm rounded-xl border border-slate-200 bg-white p-8 shadow-sm">
         <h1 className="text-xl font-semibold text-slate-900">Hotel Ops</h1>
         <p className="mt-1 text-sm text-slate-500">Autentifică-te în contul tău</p>
+
+        <Suspense fallback={null}>
+          <NoProfileBanner />
+        </Suspense>
 
         <form action={formAction} className="mt-6 space-y-4">
           <div>
