@@ -21,16 +21,16 @@ export default async function AppLayout({ children }: { children: ReactNode }) {
         </div>
 
         <nav className="flex flex-1 flex-col gap-1">
-          <NavLink href="/" icon={LayoutDashboard}>
+          <NavLink href="/" icon={<LayoutDashboard className="h-4 w-4" />}>
             Dashboard
           </NavLink>
-          <NavLink href="/rooms" icon={DoorOpen}>
+          <NavLink href="/rooms" icon={<DoorOpen className="h-4 w-4" />}>
             Camere
           </NavLink>
-          <NavLink href="/tasks" icon={ClipboardList}>
+          <NavLink href="/tasks" icon={<ClipboardList className="h-4 w-4" />}>
             Housekeeping
           </NavLink>
-          <NavLink href="/staff" icon={Users}>
+          <NavLink href="/staff" icon={<Users className="h-4 w-4" />}>
             Personal
           </NavLink>
         </nav>

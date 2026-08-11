@@ -2,15 +2,15 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import type { LucideIcon } from "lucide-react";
+import type { ReactNode } from "react";
 
 export function NavLink({
   href,
-  icon: Icon,
+  icon,
   children,
 }: {
   href: string;
-  icon: LucideIcon;
+  icon: ReactNode;
   children: React.ReactNode;
 }) {
   const pathname = usePathname();
@@ -25,7 +25,7 @@ export function NavLink({
           : "text-indigo-100 hover:bg-white/10 hover:text-white"
       }`}
     >
-      <Icon className="h-4 w-4" />
+      {icon}
       {children}
     </Link>
   );
