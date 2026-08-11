@@ -2,7 +2,7 @@ import Link from "next/link";
 import { CalendarDays, LayoutGrid } from "lucide-react";
 import { createClient } from "@/lib/supabase/server";
 import { requireAdmin } from "@/lib/current-user";
-import type { BookingWithRoom, Room } from "@/types/database";
+import type { BookingWithRoom, Guest, Room } from "@/types/database";
 import { BookingRow } from "./booking-row";
 import { CreateBookingForm } from "./create-booking-form";
 
@@ -10,13 +10,14 @@ export default async function BookingsPage() {
   await requireAdmin();
   const supabase = await createClient();
 
-  const [{ data: bookings }, { data: rooms }] = await Promise.all([
+  const [{ data: bookings }, { data: rooms }, { data: guests }] = await Promise.all([
     supabase
       .from("bookings")
       .select("*, room:rooms(id, number, floor)")
       .order("checkin", { ascending: false })
       .returns<BookingWithRoom[]>(),
     supabase.from("rooms").select("*").order("number").returns<Room[]>(),
+    supabase.from("guests").select("*").order("name").returns<Guest[]>(),
   ]);
 
   return (
@@ -38,7 +39,7 @@ export default async function BookingsPage() {
       </div>
 
       <div className="mt-5 rounded-xl border border-slate-100 bg-white p-4 shadow-sm">
-        <CreateBookingForm rooms={rooms ?? []} />
+        <CreateBookingForm rooms={rooms ?? []} guests={guests ?? []} />
       </div>
 
       <div className="mt-4 overflow-x-auto rounded-xl border border-slate-100 bg-white p-4 shadow-sm">

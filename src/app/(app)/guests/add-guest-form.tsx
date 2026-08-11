@@ -1,0 +1,65 @@
+"use client";
+
+import { useActionState, useEffect, useRef } from "react";
+import { Plus } from "lucide-react";
+import { createGuest } from "./actions";
+
+export function AddGuestForm() {
+  const [state, formAction, pending] = useActionState(createGuest, undefined);
+  const formRef = useRef<HTMLFormElement>(null);
+
+  useEffect(() => {
+    if (!pending && !state?.error) {
+      formRef.current?.reset();
+    }
+  }, [pending, state]);
+
+  return (
+    <form ref={formRef} action={formAction} className="flex flex-wrap items-end gap-3">
+      <div>
+        <label htmlFor="name" className="block text-xs font-medium text-slate-600">
+          Nume
+        </label>
+        <input
+          id="name"
+          name="name"
+          required
+          placeholder="Ion Popescu"
+          className="mt-1 w-48 rounded-lg border border-slate-300 px-2 py-1.5 text-sm shadow-sm focus:border-indigo-500 focus:outline-none focus:ring-2 focus:ring-indigo-500/20"
+        />
+      </div>
+      <div>
+        <label htmlFor="phone" className="block text-xs font-medium text-slate-600">
+          Telefon
+        </label>
+        <input
+          id="phone"
+          name="phone"
+          placeholder="07xx xxx xxx"
+          className="mt-1 w-36 rounded-lg border border-slate-300 px-2 py-1.5 text-sm shadow-sm focus:border-indigo-500 focus:outline-none focus:ring-2 focus:ring-indigo-500/20"
+        />
+      </div>
+      <div>
+        <label htmlFor="email" className="block text-xs font-medium text-slate-600">
+          Email
+        </label>
+        <input
+          id="email"
+          name="email"
+          type="email"
+          placeholder="nume@exemplu.ro"
+          className="mt-1 w-48 rounded-lg border border-slate-300 px-2 py-1.5 text-sm shadow-sm focus:border-indigo-500 focus:outline-none focus:ring-2 focus:ring-indigo-500/20"
+        />
+      </div>
+      <button
+        type="submit"
+        disabled={pending}
+        className="inline-flex items-center gap-1.5 rounded-lg bg-gradient-to-r from-indigo-600 to-violet-600 px-3 py-1.5 text-sm font-semibold text-white shadow-sm transition hover:from-indigo-500 hover:to-violet-500 disabled:opacity-60"
+      >
+        <Plus className="h-4 w-4" />
+        {pending ? "Se adaugă..." : "Adaugă client"}
+      </button>
+      {state?.error && <p className="w-full text-sm text-red-600">{state.error}</p>}
+    </form>
+  );
+}

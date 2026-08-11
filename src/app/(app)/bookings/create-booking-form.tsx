@@ -2,10 +2,10 @@
 
 import { useActionState, useEffect, useRef } from "react";
 import { Plus } from "lucide-react";
-import type { Room } from "@/types/database";
+import type { Guest, Room } from "@/types/database";
 import { createBooking } from "./actions";
 
-export function CreateBookingForm({ rooms }: { rooms: Room[] }) {
+export function CreateBookingForm({ rooms, guests }: { rooms: Room[]; guests: Guest[] }) {
   const [state, formAction, pending] = useActionState(createBooking, undefined);
   const formRef = useRef<HTMLFormElement>(null);
 
@@ -94,6 +94,23 @@ export function CreateBookingForm({ rooms }: { rooms: Room[] }) {
           <option value="direct">Direct</option>
           <option value="booking">Booking.com</option>
           <option value="expedia">Expedia</option>
+        </select>
+      </div>
+      <div>
+        <label htmlFor="guest_id" className="block text-xs font-medium text-slate-600">
+          Client fidel
+        </label>
+        <select
+          id="guest_id"
+          name="guest_id"
+          className="mt-1 w-40 rounded-lg border border-slate-300 px-2 py-1.5 text-sm shadow-sm focus:border-indigo-500 focus:outline-none focus:ring-2 focus:ring-indigo-500/20"
+        >
+          <option value="">Fără / ocazional</option>
+          {guests.map((guest) => (
+            <option key={guest.id} value={guest.id}>
+              {guest.name}
+            </option>
+          ))}
         </select>
       </div>
       <div>

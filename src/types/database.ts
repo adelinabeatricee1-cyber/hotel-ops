@@ -70,11 +70,24 @@ export interface Booking {
   amount_paid: number;
   invoice_number: number | null;
   invoice_issued_at: string | null;
+  guest_id: string | null;
+  loyalty_awarded: boolean;
   created_at: string;
 }
 
 export interface BookingWithRoom extends Booking {
   room: Pick<Room, "id" | "number" | "floor"> | null;
+}
+
+export interface Guest {
+  id: string;
+  hotel_id: string;
+  name: string;
+  phone: string | null;
+  email: string | null;
+  loyalty_points: number;
+  visit_count: number;
+  created_at: string;
 }
 
 export type InviteRole = "manager" | "staff";

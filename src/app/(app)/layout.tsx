@@ -8,6 +8,7 @@ import {
   DoorOpen,
   CalendarDays,
   BarChart3,
+  Heart,
 } from "lucide-react";
 import { requireProfile } from "@/lib/current-user";
 import { logout } from "../(auth)/actions";
@@ -40,6 +41,11 @@ export default async function AppLayout({ children }: { children: ReactNode }) {
           {canManage && (
             <NavLink href="/bookings" icon={<CalendarDays className="h-4 w-4" />}>
               Rezervări
+            </NavLink>
+          )}
+          {canManage && (
+            <NavLink href="/guests" icon={<Heart className="h-4 w-4" />}>
+              Clienți fideli
             </NavLink>
           )}
           <NavLink href="/tasks" icon={<ClipboardList className="h-4 w-4" />}>

@@ -352,3 +352,61 @@ end;
 $$;
 
 grant execute on function redeem_invite(uuid, text) to authenticated;
+
+-- ---------------------------------------------------------------------------
+-- Loyal guests + points, auto-awarded when a booking is marked paid.
+-- ---------------------------------------------------------------------------
+
+create table if not exists guests (
+  id uuid primary key default gen_random_uuid(),
+  hotel_id uuid not null references hotels (id) on delete cascade,
+  name text not null,
+  phone text,
+  email text,
+  loyalty_points int not null default 0,
+  visit_count int not null default 0,
+  created_at timestamptz not null default now()
+);
+
+create index if not exists guests_hotel_id_idx on guests (hotel_id);
+
+alter table guests enable row level security;
+
+drop policy if exists "guests: admin/manager own hotel" on guests;
+create policy "guests: admin/manager own hotel" on guests
+  for all
+  using (hotel_id = auth_hotel_id() and auth_role() in ('admin', 'manager'))
+  with check (hotel_id = auth_hotel_id() and auth_role() in ('admin', 'manager'));
+
+alter table bookings add column if not exists guest_id uuid references guests (id) on delete set null;
+alter table bookings add column if not exists loyalty_awarded boolean not null default false;
+
+create index if not exists bookings_guest_id_idx on bookings (guest_id);
+
+-- 1 point per 10 RON, awarded once, the first time a booking flips to paid.
+create or replace function handle_booking_paid()
+returns trigger
+language plpgsql
+security definer
+set search_path = public
+as $$
+begin
+  if new.payment_status = 'paid'
+     and old.payment_status is distinct from 'paid'
+     and new.guest_id is not null
+     and not new.loyalty_awarded then
+    update guests
+      set loyalty_points = loyalty_points + floor(coalesce(new.price, 0) / 10)::int,
+          visit_count = visit_count + 1
+      where id = new.guest_id;
+    new.loyalty_awarded := true;
+  end if;
+  return new;
+end;
+$$;
+
+drop trigger if exists trg_booking_paid on bookings;
+create trigger trg_booking_paid
+  before update on bookings
+  for each row
+  execute function handle_booking_paid();
