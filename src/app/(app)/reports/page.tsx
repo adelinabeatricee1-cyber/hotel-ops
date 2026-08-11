@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { BarChart3, ChevronLeft, ChevronRight, Percent, Wallet, TrendingUp } from "lucide-react";
 import { createClient } from "@/lib/supabase/server";
+import { requireAdmin } from "@/lib/current-user";
 import { resolveMonth } from "@/lib/date-utils";
 import type { BookingSource } from "@/types/database";
 import { SOURCE_LABELS } from "../bookings/labels";
@@ -20,6 +21,7 @@ export default async function ReportsPage({
 }: {
   searchParams: Promise<{ month?: string }>;
 }) {
+  await requireAdmin();
   const { month } = await searchParams;
   const range = resolveMonth(month);
   const supabase = await createClient();

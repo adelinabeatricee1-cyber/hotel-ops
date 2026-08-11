@@ -1,7 +1,12 @@
 import { createServerClient } from "@supabase/ssr";
 import { NextResponse, type NextRequest } from "next/server";
 
-const PUBLIC_PATHS = ["/login", "/signup"];
+// Redirected away from when already authenticated.
+const PUBLIC_ONLY_PATHS = ["/login", "/signup"];
+// Reachable without an active session, but not force-redirected away from
+// when authenticated (e.g. /join, which an already-signed-in user might
+// still open by mistake or intentionally).
+const PUBLIC_PATHS = [...PUBLIC_ONLY_PATHS, "/join"];
 
 export async function updateSession(request: NextRequest) {
   let supabaseResponse = NextResponse.next({ request });
@@ -37,7 +42,11 @@ export async function updateSession(request: NextRequest) {
     return NextResponse.redirect(url);
   }
 
-  if (user && isPublicPath) {
+  const isPublicOnlyPath = PUBLIC_ONLY_PATHS.some((path) =>
+    request.nextUrl.pathname.startsWith(path),
+  );
+
+  if (user && isPublicOnlyPath) {
     const url = request.nextUrl.clone();
     url.pathname = "/";
     return NextResponse.redirect(url);

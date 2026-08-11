@@ -18,7 +18,7 @@ function avatarColor(name: string) {
   return AVATAR_COLORS[idx];
 }
 
-export function StaffRow({ member }: { member: Staff }) {
+export function StaffRow({ member, canManage }: { member: Staff; canManage: boolean }) {
   const [isPending, startTransition] = useTransition();
 
   function handleDelete() {
@@ -43,15 +43,17 @@ export function StaffRow({ member }: { member: Staff }) {
       <td className="py-2.5 pr-4 text-sm text-slate-600">{member.role || "—"}</td>
       <td className="py-2.5 pr-4 text-sm text-slate-600">{member.phone || "—"}</td>
       <td className="py-2.5 text-right">
-        <button
-          type="button"
-          onClick={handleDelete}
-          disabled={isPending}
-          className="inline-flex items-center gap-1 text-xs font-medium text-red-500 hover:text-red-600 disabled:opacity-40"
-        >
-          <Trash2 className="h-3 w-3" />
-          Șterge
-        </button>
+        {canManage && (
+          <button
+            type="button"
+            onClick={handleDelete}
+            disabled={isPending}
+            className="inline-flex items-center gap-1 text-xs font-medium text-red-500 hover:text-red-600 disabled:opacity-40"
+          >
+            <Trash2 className="h-3 w-3" />
+            Șterge
+          </button>
+        )}
       </td>
     </tr>
   );

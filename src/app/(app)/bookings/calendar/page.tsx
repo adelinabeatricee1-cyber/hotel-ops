@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { CalendarDays, ChevronLeft, ChevronRight, List } from "lucide-react";
 import { createClient } from "@/lib/supabase/server";
+import { requireAdmin } from "@/lib/current-user";
 import { dayOfMonthLabel, isWeekend, resolveMonth } from "@/lib/date-utils";
 import type { Room } from "@/types/database";
 
@@ -17,6 +18,7 @@ export default async function BookingsCalendarPage({
 }: {
   searchParams: Promise<{ month?: string }>;
 }) {
+  await requireAdmin();
   const { month } = await searchParams;
   const range = resolveMonth(month);
   const supabase = await createClient();

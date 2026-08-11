@@ -2,7 +2,7 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { ArrowLeft, BedDouble } from "lucide-react";
 import { createClient } from "@/lib/supabase/server";
-import { requireProfile } from "@/lib/current-user";
+import { requireAdmin } from "@/lib/current-user";
 import type { BookingWithRoom } from "@/types/database";
 import { PAYMENT_STATUS_LABELS, PAYMENT_STATUS_STYLES, SOURCE_LABELS } from "../../labels";
 import { PrintButton } from "./print-button";
@@ -17,7 +17,7 @@ function formatDate(value: string) {
 
 export default async function InvoicePage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
-  const { hotel } = await requireProfile();
+  const { hotel } = await requireAdmin();
   const supabase = await createClient();
 
   // Idempotent: assigns the next sequential number only the first time.

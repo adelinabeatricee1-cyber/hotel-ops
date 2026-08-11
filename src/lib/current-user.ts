@@ -41,3 +41,13 @@ export async function requireProfile(): Promise<{ profile: Profile; hotel: Hotel
 
   return { profile, hotel };
 }
+
+export async function requireAdmin(): Promise<{ profile: Profile; hotel: Hotel }> {
+  const result = await requireProfile();
+
+  if (result.profile.role !== "admin" && result.profile.role !== "manager") {
+    redirect("/");
+  }
+
+  return result;
+}

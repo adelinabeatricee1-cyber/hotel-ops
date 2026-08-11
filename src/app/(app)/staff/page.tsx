@@ -1,16 +1,28 @@
 import { Users } from "lucide-react";
 import { createClient } from "@/lib/supabase/server";
-import type { Staff } from "@/types/database";
+import { requireProfile } from "@/lib/current-user";
+import type { Invite, Staff } from "@/types/database";
 import { AddStaffForm } from "./add-staff-form";
+import { InviteSection } from "./invite-section";
 import { StaffRow } from "./staff-row";
 
 export default async function StaffPage() {
+  const { profile } = await requireProfile();
+  const canManage = profile.role === "admin" || profile.role === "manager";
   const supabase = await createClient();
-  const { data: staff } = await supabase
-    .from("staff")
-    .select("*")
-    .order("name")
-    .returns<Staff[]>();
+
+  const [{ data: staff }, { data: invites }] = await Promise.all([
+    supabase.from("staff").select("*").order("name").returns<Staff[]>(),
+    canManage
+      ? supabase
+          .from("invites")
+          .select("*")
+          .is("used_at", null)
+          .gt("expires_at", new Date().toISOString())
+          .order("created_at", { ascending: false })
+          .returns<Invite[]>()
+      : Promise.resolve({ data: [] as Invite[] }),
+  ]);
 
   return (
     <div>
@@ -21,9 +33,14 @@ export default async function StaffPage() {
         <h1 className="text-2xl font-bold text-slate-900">Personal</h1>
       </div>
 
-      <div className="mt-5 rounded-xl border border-slate-100 bg-white p-4 shadow-sm">
-        <AddStaffForm />
-      </div>
+      {canManage && (
+        <>
+          <div className="mt-5 rounded-xl border border-slate-100 bg-white p-4 shadow-sm">
+            <AddStaffForm />
+          </div>
+          <InviteSection invites={invites ?? []} />
+        </>
+      )}
 
       <div className="mt-4 rounded-xl border border-slate-100 bg-white p-4 shadow-sm">
         {staff && staff.length > 0 ? (
@@ -38,7 +55,7 @@ export default async function StaffPage() {
             </thead>
             <tbody>
               {staff.map((member) => (
-                <StaffRow key={member.id} member={member} />
+                <StaffRow key={member.id} member={member} canManage={canManage} />
               ))}
             </tbody>
           </table>

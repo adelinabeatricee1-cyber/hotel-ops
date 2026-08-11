@@ -76,3 +76,18 @@ export interface Booking {
 export interface BookingWithRoom extends Booking {
   room: Pick<Room, "id" | "number" | "floor"> | null;
 }
+
+export type InviteRole = "manager" | "staff";
+
+export interface Invite {
+  id: string;
+  hotel_id: string;
+  email: string | null;
+  role: InviteRole;
+  token: string;
+  created_by: string | null;
+  created_at: string;
+  expires_at: string;
+  used_at: string | null;
+  used_by: string | null;
+}

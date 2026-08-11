@@ -15,6 +15,7 @@ import { NavLink } from "./nav-link";
 
 export default async function AppLayout({ children }: { children: ReactNode }) {
   const { profile, hotel } = await requireProfile();
+  const canManage = profile.role === "admin" || profile.role === "manager";
 
   return (
     <div className="flex min-h-screen bg-slate-50">
@@ -36,18 +37,22 @@ export default async function AppLayout({ children }: { children: ReactNode }) {
           <NavLink href="/rooms" icon={<DoorOpen className="h-4 w-4" />}>
             Camere
           </NavLink>
-          <NavLink href="/bookings" icon={<CalendarDays className="h-4 w-4" />}>
-            Rezervări
-          </NavLink>
+          {canManage && (
+            <NavLink href="/bookings" icon={<CalendarDays className="h-4 w-4" />}>
+              Rezervări
+            </NavLink>
+          )}
           <NavLink href="/tasks" icon={<ClipboardList className="h-4 w-4" />}>
             Housekeeping
           </NavLink>
           <NavLink href="/staff" icon={<Users className="h-4 w-4" />}>
             Personal
           </NavLink>
-          <NavLink href="/reports" icon={<BarChart3 className="h-4 w-4" />}>
-            Rapoarte
-          </NavLink>
+          {canManage && (
+            <NavLink href="/reports" icon={<BarChart3 className="h-4 w-4" />}>
+              Rapoarte
+            </NavLink>
+          )}
         </nav>
 
         <div className="border-t border-white/10 pt-4">

@@ -1,11 +1,13 @@
 import Link from "next/link";
 import { CalendarDays, LayoutGrid } from "lucide-react";
 import { createClient } from "@/lib/supabase/server";
+import { requireAdmin } from "@/lib/current-user";
 import type { BookingWithRoom, Room } from "@/types/database";
 import { BookingRow } from "./booking-row";
 import { CreateBookingForm } from "./create-booking-form";
 
 export default async function BookingsPage() {
+  await requireAdmin();
   const supabase = await createClient();
 
   const [{ data: bookings }, { data: rooms }] = await Promise.all([

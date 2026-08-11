@@ -211,3 +211,144 @@ end;
 $$;
 
 grant execute on function issue_invoice_number(uuid) to authenticated;
+
+-- ---------------------------------------------------------------------------
+-- Staff accounts: invite links so an admin can bring teammates into the
+-- same hotel with their own login, instead of everyone sharing one account.
+-- ---------------------------------------------------------------------------
+
+create table if not exists invites (
+  id uuid primary key default gen_random_uuid(),
+  hotel_id uuid not null references hotels (id) on delete cascade,
+  email text,
+  role text not null default 'staff' check (role in ('manager', 'staff')),
+  token uuid not null default gen_random_uuid() unique,
+  created_by uuid references profiles (id) on delete set null,
+  created_at timestamptz not null default now(),
+  expires_at timestamptz not null default (now() + interval '7 days'),
+  used_at timestamptz,
+  used_by uuid references profiles (id) on delete set null
+);
+
+create index if not exists invites_hotel_id_idx on invites (hotel_id);
+
+alter table invites enable row level security;
+
+-- Current user's role, for policies that need to distinguish admin/manager
+-- from regular staff.
+create or replace function auth_role()
+returns text
+language sql
+security definer
+stable
+set search_path = public
+as $$
+  select role from profiles where id = auth.uid();
+$$;
+
+drop policy if exists "invites: admin/manager manage own hotel" on invites;
+create policy "invites: admin/manager manage own hotel" on invites
+  for all
+  using (hotel_id = auth_hotel_id() and auth_role() in ('admin', 'manager'))
+  with check (hotel_id = auth_hotel_id() and auth_role() in ('admin', 'manager'));
+
+-- Guest financial data (bookings/invoices) is admin/manager only; regular
+-- staff (housekeeping etc.) never see pricing or payment status.
+drop policy if exists "bookings: all own hotel" on bookings;
+drop policy if exists "bookings: admin/manager own hotel" on bookings;
+create policy "bookings: admin/manager own hotel" on bookings
+  for all
+  using (hotel_id = auth_hotel_id() and auth_role() in ('admin', 'manager'))
+  with check (hotel_id = auth_hotel_id() and auth_role() in ('admin', 'manager'));
+
+-- Everyone in the hotel can see the staff directory (needed to assign
+-- housekeeping tasks), but only admin/manager can add, edit, or remove
+-- people.
+drop policy if exists "staff: all own hotel" on staff;
+drop policy if exists "staff: select own hotel" on staff;
+create policy "staff: select own hotel" on staff
+  for select using (hotel_id = auth_hotel_id());
+
+drop policy if exists "staff: admin/manager insert" on staff;
+create policy "staff: admin/manager insert" on staff
+  for insert with check (hotel_id = auth_hotel_id() and auth_role() in ('admin', 'manager'));
+
+drop policy if exists "staff: admin/manager update" on staff;
+create policy "staff: admin/manager update" on staff
+  for update using (hotel_id = auth_hotel_id() and auth_role() in ('admin', 'manager'));
+
+drop policy if exists "staff: admin/manager delete" on staff;
+create policy "staff: admin/manager delete" on staff
+  for delete using (hotel_id = auth_hotel_id() and auth_role() in ('admin', 'manager'));
+
+-- Read-only preview so an invite link can greet an unauthenticated visitor
+-- ("You're invited to join <hotel> as <role>") before they sign up.
+create or replace function get_invite_info(p_token uuid)
+returns table (hotel_name text, role text, valid boolean)
+language plpgsql
+security definer
+set search_path = public
+as $$
+declare
+  v_invite invites%rowtype;
+begin
+  select * into v_invite from invites where token = p_token;
+
+  if v_invite.id is null or v_invite.used_at is not null or v_invite.expires_at < now() then
+    return query select null::text, null::text, false;
+    return;
+  end if;
+
+  return query
+    select h.name, v_invite.role, true
+    from hotels h where h.id = v_invite.hotel_id;
+end;
+$$;
+
+grant execute on function get_invite_info(uuid) to anon, authenticated;
+
+-- Redeems an invite for the currently authenticated user: creates their
+-- profile in the invite's hotel with the invite's role, then marks the
+-- invite used. Mirrors create_hotel_and_profile()'s pattern for signup.
+create or replace function redeem_invite(p_token uuid, p_full_name text)
+returns uuid
+language plpgsql
+security definer
+set search_path = public
+as $$
+declare
+  v_invite invites%rowtype;
+  v_user_id uuid := auth.uid();
+begin
+  if v_user_id is null then
+    raise exception 'must be authenticated';
+  end if;
+
+  if exists (select 1 from profiles where id = v_user_id) then
+    raise exception 'profile already exists for this user';
+  end if;
+
+  select * into v_invite from invites where token = p_token for update;
+
+  if v_invite.id is null then
+    raise exception 'invalid invite';
+  end if;
+
+  if v_invite.used_at is not null then
+    raise exception 'invite already used';
+  end if;
+
+  if v_invite.expires_at < now() then
+    raise exception 'invite expired';
+  end if;
+
+  insert into profiles (id, hotel_id, full_name, role)
+  values (v_user_id, v_invite.hotel_id, p_full_name, v_invite.role);
+
+  update invites set used_at = now(), used_by = v_user_id where id = v_invite.id;
+
+  return v_invite.hotel_id;
+end;
+$$;
+
+grant execute on function redeem_invite(uuid, text) to authenticated;
