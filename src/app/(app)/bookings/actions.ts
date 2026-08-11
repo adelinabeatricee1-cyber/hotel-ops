@@ -28,6 +28,22 @@ export async function createBooking(
     return { error: "Data de check-out trebuie să fie după check-in." };
   }
 
+  const { data: conflicts } = await supabase
+    .from("bookings")
+    .select("guest_name, checkin, checkout")
+    .eq("room_id", roomId)
+    .neq("status", "cancelled")
+    .lt("checkin", checkout)
+    .gt("checkout", checkin)
+    .limit(1);
+
+  if (conflicts && conflicts.length > 0) {
+    const conflict = conflicts[0];
+    return {
+      error: `Camera este deja rezervată în acest interval, pentru ${conflict.guest_name} (${conflict.checkin} → ${conflict.checkout}).`,
+    };
+  }
+
   const { error } = await supabase.from("bookings").insert({
     hotel_id: profile.hotel_id,
     room_id: roomId,

@@ -1,4 +1,5 @@
-import { CalendarDays } from "lucide-react";
+import Link from "next/link";
+import { CalendarDays, LayoutGrid } from "lucide-react";
 import { createClient } from "@/lib/supabase/server";
 import type { BookingWithRoom, Room } from "@/types/database";
 import { BookingRow } from "./booking-row";
@@ -18,11 +19,20 @@ export default async function BookingsPage() {
 
   return (
     <div>
-      <div className="flex items-center gap-2.5">
-        <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-indigo-100 text-indigo-600">
-          <CalendarDays className="h-5 w-5" />
+      <div className="flex items-center justify-between">
+        <div className="flex items-center gap-2.5">
+          <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-indigo-100 text-indigo-600">
+            <CalendarDays className="h-5 w-5" />
+          </div>
+          <h1 className="text-2xl font-bold text-slate-900">Rezervări</h1>
         </div>
-        <h1 className="text-2xl font-bold text-slate-900">Rezervări</h1>
+        <Link
+          href="/bookings/calendar"
+          className="inline-flex items-center gap-1.5 rounded-lg border border-slate-200 bg-white px-3 py-1.5 text-sm font-medium text-slate-600 shadow-sm hover:border-indigo-300 hover:text-indigo-700"
+        >
+          <LayoutGrid className="h-4 w-4" />
+          Vezi calendar
+        </Link>
       </div>
 
       <div className="mt-5 rounded-xl border border-slate-100 bg-white p-4 shadow-sm">

@@ -7,6 +7,7 @@ import {
   LogOut,
   DoorOpen,
   CalendarDays,
+  BarChart3,
 } from "lucide-react";
 import { requireProfile } from "@/lib/current-user";
 import { logout } from "../(auth)/actions";
@@ -43,6 +44,9 @@ export default async function AppLayout({ children }: { children: ReactNode }) {
           </NavLink>
           <NavLink href="/staff" icon={<Users className="h-4 w-4" />}>
             Personal
+          </NavLink>
+          <NavLink href="/reports" icon={<BarChart3 className="h-4 w-4" />}>
+            Rapoarte
           </NavLink>
         </nav>
 
