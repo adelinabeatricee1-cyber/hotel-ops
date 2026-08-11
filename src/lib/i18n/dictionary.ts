@@ -10,6 +10,7 @@ export interface Dictionary {
     staff: string;
     reports: string;
     parking: string;
+    settings: string;
     logout: string;
   };
   dashboard: {
@@ -58,6 +59,7 @@ export const dictionaries: Record<Locale, Dictionary> = {
       staff: "Personal",
       reports: "Rapoarte",
       parking: "Parcare",
+      settings: "Setări",
       logout: "Deconectare",
     },
     dashboard: {
@@ -113,6 +115,7 @@ export const dictionaries: Record<Locale, Dictionary> = {
       staff: "Staff",
       reports: "Reports",
       parking: "Parking",
+      settings: "Settings",
       logout: "Sign out",
     },
     dashboard: {

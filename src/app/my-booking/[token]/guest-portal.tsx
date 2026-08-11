@@ -1,0 +1,353 @@
+"use client";
+
+import { useActionState, useState, useTransition } from "react";
+import {
+  Sparkles,
+  Car,
+  Wifi,
+  MessageCircleMore,
+  MessageSquareWarning,
+  Receipt,
+  Check,
+} from "lucide-react";
+import { requestHousekeeping, requestParking, submitFeedback } from "./actions";
+import { PAYMENT_STATUS_LABELS, PAYMENT_STATUS_STYLES } from "@/app/(app)/bookings/labels";
+import type { PaymentStatus } from "@/types/database";
+
+function ActionCard({
+  icon,
+  title,
+  subtitle,
+  children,
+}: {
+  icon: React.ReactNode;
+  title: string;
+  subtitle: string;
+  children?: React.ReactNode;
+}) {
+  return (
+    <div className="rounded-2xl bg-white p-5 shadow-sm ring-1 ring-black/5">
+      <div className="flex items-center gap-3">
+        <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-[#f6e9ec] text-[#7a2540]">
+          {icon}
+        </div>
+        <div>
+          <p className="font-semibold text-stone-900">{title}</p>
+          <p className="text-xs text-stone-500">{subtitle}</p>
+        </div>
+      </div>
+      {children && <div className="mt-4">{children}</div>}
+    </div>
+  );
+}
+
+function HousekeepingCard({ token }: { token: string }) {
+  const [state, formAction, pending] = useActionState(requestHousekeeping, undefined);
+  const [note, setNote] = useState("");
+
+  if (state?.success) {
+    return (
+      <ActionCard
+        icon={<Sparkles className="h-5 w-5" />}
+        title="Housekeeping"
+        subtitle="Prosoape, curățenie, consumabile"
+      >
+        <p className="flex items-center gap-1.5 text-sm font-medium text-emerald-600">
+          <Check className="h-4 w-4" />
+          Cerere trimisă — echipa a fost anunțată.
+        </p>
+      </ActionCard>
+    );
+  }
+
+  return (
+    <ActionCard
+      icon={<Sparkles className="h-5 w-5" />}
+      title="Housekeeping"
+      subtitle="Prosoape, curățenie, consumabile"
+    >
+      <form action={formAction} className="space-y-2">
+        <input type="hidden" name="token" value={token} />
+        <input
+          name="note"
+          value={note}
+          onChange={(e) => setNote(e.target.value)}
+          placeholder="Ex: prosoape curate, apă"
+          className="w-full rounded-lg border border-stone-200 px-3 py-2 text-sm focus:border-[#7a2540] focus:outline-none focus:ring-2 focus:ring-[#7a2540]/10"
+        />
+        <button
+          type="submit"
+          disabled={pending}
+          className="w-full rounded-lg bg-[#7a2540] px-3 py-2 text-sm font-semibold text-white transition hover:bg-[#651e34] disabled:opacity-60"
+        >
+          {pending ? "Se trimite..." : "Trimite cerere"}
+        </button>
+        {state?.error && <p className="text-xs text-red-600">{state.error}</p>}
+      </form>
+    </ActionCard>
+  );
+}
+
+function ParkingCard({ token, initialLabel }: { token: string; initialLabel: string | null }) {
+  const [label, setLabel] = useState(initialLabel);
+  const [notFound, setNotFound] = useState(false);
+  const [isPending, startTransition] = useTransition();
+
+  function handleRequest() {
+    setNotFound(false);
+    startTransition(async () => {
+      const result = await requestParking(token);
+      if (result.label) {
+        setLabel(result.label);
+      } else {
+        setNotFound(true);
+      }
+    });
+  }
+
+  return (
+    <ActionCard icon={<Car className="h-5 w-5" />} title="Parcare" subtitle="Loc alocat pentru sejurul tău">
+      {label ? (
+        <p className="text-sm text-stone-700">
+          Locul tău: <span className="font-semibold text-stone-900">{label}</span>
+        </p>
+      ) : (
+        <div>
+          <button
+            type="button"
+            onClick={handleRequest}
+            disabled={isPending}
+            className="w-full rounded-lg bg-[#7a2540] px-3 py-2 text-sm font-semibold text-white transition hover:bg-[#651e34] disabled:opacity-60"
+          >
+            {isPending ? "Se caută..." : "Solicită loc de parcare"}
+          </button>
+          {notFound && (
+            <p className="mt-2 text-xs text-red-600">
+              Niciun loc liber momentan — contactează recepția.
+            </p>
+          )}
+        </div>
+      )}
+    </ActionCard>
+  );
+}
+
+function FeedbackCard({ token }: { token: string }) {
+  const [state, formAction, pending] = useActionState(submitFeedback, undefined);
+  const [message, setMessage] = useState("");
+
+  if (state?.success) {
+    return (
+      <ActionCard
+        icon={<MessageSquareWarning className="h-5 w-5" />}
+        title="Feedback / problemă"
+        subtitle="Trimite acum, nu după checkout"
+      >
+        <p className="flex items-center gap-1.5 text-sm font-medium text-emerald-600">
+          <Check className="h-4 w-4" />
+          Mulțumim! Mesajul a fost trimis recepției.
+        </p>
+      </ActionCard>
+    );
+  }
+
+  return (
+    <ActionCard
+      icon={<MessageSquareWarning className="h-5 w-5" />}
+      title="Feedback / problemă"
+      subtitle="Trimite acum, nu după checkout"
+    >
+      <form action={formAction} className="space-y-2">
+        <input type="hidden" name="token" value={token} />
+        <textarea
+          name="message"
+          value={message}
+          onChange={(e) => setMessage(e.target.value)}
+          rows={2}
+          placeholder="Spune-ne ce e în neregulă sau ce ai nevoie"
+          className="w-full rounded-lg border border-stone-200 px-3 py-2 text-sm focus:border-[#7a2540] focus:outline-none focus:ring-2 focus:ring-[#7a2540]/10"
+        />
+        <button
+          type="submit"
+          disabled={pending}
+          className="w-full rounded-lg bg-[#7a2540] px-3 py-2 text-sm font-semibold text-white transition hover:bg-[#651e34] disabled:opacity-60"
+        >
+          {pending ? "Se trimite..." : "Trimite"}
+        </button>
+        {state?.error && <p className="text-xs text-red-600">{state.error}</p>}
+      </form>
+    </ActionCard>
+  );
+}
+
+function WifiCard({ network, password }: { network: string | null; password: string | null }) {
+  return (
+    <ActionCard icon={<Wifi className="h-5 w-5" />} title="Wi-Fi" subtitle="Acces gratuit pe durata sejurului">
+      <div className="space-y-1 text-sm text-stone-700">
+        {network && (
+          <p>
+            Rețea: <span className="font-semibold text-stone-900">{network}</span>
+          </p>
+        )}
+        {password && (
+          <p>
+            Parolă: <span className="font-semibold text-stone-900">{password}</span>
+          </p>
+        )}
+      </div>
+    </ActionCard>
+  );
+}
+
+function ReceptionCard({ phone, guestName }: { phone: string; guestName: string }) {
+  const text = encodeURIComponent(`Bună, sunt ${guestName}. `);
+  return (
+    <ActionCard
+      icon={<MessageCircleMore className="h-5 w-5" />}
+      title="Scrie recepției"
+      subtitle="Răspuns rapid pe WhatsApp"
+    >
+      <a
+        href={`https://wa.me/${phone}?text=${text}`}
+        target="_blank"
+        rel="noopener noreferrer"
+        className="block w-full rounded-lg bg-[#7a2540] px-3 py-2 text-center text-sm font-semibold text-white transition hover:bg-[#651e34]"
+      >
+        Deschide WhatsApp
+      </a>
+    </ActionCard>
+  );
+}
+
+function StayCard({
+  roomNumber,
+  checkin,
+  checkout,
+  price,
+  amountPaid,
+  paymentStatus,
+  invoiceNumber,
+}: {
+  roomNumber: string | null;
+  checkin: string;
+  checkout: string;
+  price: number;
+  amountPaid: number;
+  paymentStatus: PaymentStatus;
+  invoiceNumber: number | null;
+}) {
+  const due = Math.max(price - amountPaid, 0);
+
+  function formatDate(value: string) {
+    return new Date(value).toLocaleDateString("ro-RO", { day: "numeric", month: "long" });
+  }
+
+  return (
+    <div className="rounded-2xl bg-white p-5 shadow-sm ring-1 ring-black/5 sm:col-span-2">
+      <div className="flex items-center gap-3">
+        <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-[#f6e9ec] text-[#7a2540]">
+          <Receipt className="h-5 w-5" />
+        </div>
+        <div>
+          <p className="font-semibold text-stone-900">Sejurul tău</p>
+          <p className="text-xs text-stone-500">
+            {roomNumber ? `Camera ${roomNumber} · ` : ""}
+            {formatDate(checkin)} → {formatDate(checkout)}
+          </p>
+        </div>
+      </div>
+
+      <div className="mt-4 flex flex-wrap items-center justify-between gap-3 border-t border-stone-100 pt-4">
+        <div className="text-sm text-stone-600">
+          <p>
+            Total <span className="font-semibold text-stone-900">{price.toFixed(2)} RON</span>
+          </p>
+          {due > 0 && (
+            <p className="text-xs text-stone-500">Rest de plată: {due.toFixed(2)} RON</p>
+          )}
+          {invoiceNumber && <p className="text-xs text-stone-400">Factură #{invoiceNumber}</p>}
+        </div>
+        <span
+          className={`inline-flex items-center rounded-full px-3 py-1 text-sm font-semibold ${PAYMENT_STATUS_STYLES[paymentStatus]}`}
+        >
+          {PAYMENT_STATUS_LABELS[paymentStatus]}
+        </span>
+      </div>
+    </div>
+  );
+}
+
+export function GuestPortal({
+  token,
+  guestName,
+  hotelName,
+  roomNumber,
+  checkin,
+  checkout,
+  price,
+  amountPaid,
+  paymentStatus,
+  invoiceNumber,
+  wifiNetwork,
+  wifiPassword,
+  receptionPhone,
+  parkingLabel,
+}: {
+  token: string;
+  guestName: string;
+  hotelName: string;
+  roomNumber: string | null;
+  checkin: string;
+  checkout: string;
+  price: number;
+  amountPaid: number;
+  paymentStatus: PaymentStatus;
+  invoiceNumber: number | null;
+  wifiNetwork: string | null;
+  wifiPassword: string | null;
+  receptionPhone: string | null;
+  parkingLabel: string | null;
+}) {
+  return (
+    <div className="mx-auto max-w-2xl">
+      <div className="rounded-2xl bg-gradient-to-br from-[#7a2540] to-[#4a1526] p-6 text-white print:rounded-none">
+        <p className="text-sm text-white/70">{hotelName}</p>
+        <h1 className="mt-1 text-2xl font-bold">Bun venit, {guestName}!</h1>
+        <p className="mt-1 text-sm text-white/80">
+          Tot ce ai nevoie pentru sejurul tău, într-un singur loc.
+        </p>
+      </div>
+
+      <div className="mt-4 grid grid-cols-1 gap-4 sm:grid-cols-2 print:hidden">
+        <HousekeepingCard token={token} />
+        <ParkingCard token={token} initialLabel={parkingLabel} />
+        {(wifiNetwork || wifiPassword) && (
+          <WifiCard network={wifiNetwork} password={wifiPassword} />
+        )}
+        {receptionPhone && <ReceptionCard phone={receptionPhone} guestName={guestName} />}
+        <FeedbackCard token={token} />
+        <StayCard
+          roomNumber={roomNumber}
+          checkin={checkin}
+          checkout={checkout}
+          price={price}
+          amountPaid={amountPaid}
+          paymentStatus={paymentStatus}
+          invoiceNumber={invoiceNumber}
+        />
+      </div>
+
+      <div className="mt-4 hidden print:block">
+        <StayCard
+          roomNumber={roomNumber}
+          checkin={checkin}
+          checkout={checkout}
+          price={price}
+          amountPaid={amountPaid}
+          paymentStatus={paymentStatus}
+          invoiceNumber={invoiceNumber}
+        />
+      </div>
+    </div>
+  );
+}

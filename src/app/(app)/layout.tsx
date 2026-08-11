@@ -10,6 +10,7 @@ import {
   BarChart3,
   Heart,
   SquareParking,
+  Settings,
 } from "lucide-react";
 import { requireProfile } from "@/lib/current-user";
 import { getDictionary } from "@/lib/i18n/get-locale";
@@ -68,6 +69,11 @@ export default async function AppLayout({ children }: { children: ReactNode }) {
           {canManage && (
             <NavLink href="/reports" icon={<BarChart3 className="h-4 w-4" />}>
               {t.nav.reports}
+            </NavLink>
+          )}
+          {canManage && (
+            <NavLink href="/settings" icon={<Settings className="h-4 w-4" />}>
+              {t.nav.settings}
             </NavLink>
           )}
         </nav>

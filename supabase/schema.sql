@@ -487,3 +487,156 @@ end;
 $$;
 
 grant execute on function get_booking_by_token(uuid) to anon, authenticated;
+
+-- ---------------------------------------------------------------------------
+-- Guest portal v2: hotel-wide guest info (Wi-Fi, reception contact) plus
+-- token-scoped actions a guest can trigger without an account. Each RPC
+-- re-derives hotel_id/room_id from the booking's token server-side, so a
+-- guest can only ever act on their own booking.
+-- ---------------------------------------------------------------------------
+
+alter table hotels add column if not exists wifi_network text;
+alter table hotels add column if not exists wifi_password text;
+alter table hotels add column if not exists reception_phone text;
+
+create or replace function get_booking_by_token(p_token uuid)
+returns table (
+  guest_name text,
+  checkin date,
+  checkout date,
+  room_number text,
+  price numeric,
+  amount_paid numeric,
+  payment_status text,
+  invoice_number int,
+  hotel_name text,
+  wifi_network text,
+  wifi_password text,
+  reception_phone text,
+  parking_label text
+)
+language plpgsql
+security definer
+set search_path = public
+as $$
+begin
+  return query
+    select b.guest_name, b.checkin, b.checkout, r.number, b.price, b.amount_paid,
+           b.payment_status, b.invoice_number, h.name,
+           h.wifi_network, h.wifi_password, h.reception_phone,
+           (select p.label from parking_spots p
+              where p.hotel_id = b.hotel_id and p.guest_name = b.guest_name
+                and p.status = 'occupied'
+              limit 1)
+    from bookings b
+    left join rooms r on r.id = b.room_id
+    join hotels h on h.id = b.hotel_id
+    where b.guest_access_token = p_token;
+end;
+$$;
+
+grant execute on function get_booking_by_token(uuid) to anon, authenticated;
+
+create or replace function request_guest_housekeeping(p_token uuid, p_note text)
+returns void
+language plpgsql
+security definer
+set search_path = public
+as $$
+declare
+  v_booking bookings%rowtype;
+begin
+  select * into v_booking from bookings where guest_access_token = p_token;
+
+  if v_booking.id is null then
+    raise exception 'invalid token';
+  end if;
+
+  insert into tasks (hotel_id, room_id, type, status, notes)
+  values (
+    v_booking.hotel_id,
+    v_booking.room_id,
+    'housekeeping',
+    'todo',
+    'Solicitare oaspete (' || v_booking.guest_name || '): ' || coalesce(nullif(trim(p_note), ''), 'curățenie cameră')
+  );
+end;
+$$;
+
+grant execute on function request_guest_housekeeping(uuid, text) to anon, authenticated;
+
+create or replace function request_guest_parking(p_token uuid)
+returns text
+language plpgsql
+security definer
+set search_path = public
+as $$
+declare
+  v_booking bookings%rowtype;
+  v_existing text;
+  v_spot_id uuid;
+  v_label text;
+begin
+  select * into v_booking from bookings where guest_access_token = p_token;
+
+  if v_booking.id is null then
+    raise exception 'invalid token';
+  end if;
+
+  select label into v_existing from parking_spots
+    where hotel_id = v_booking.hotel_id and guest_name = v_booking.guest_name and status = 'occupied'
+    limit 1;
+
+  if v_existing is not null then
+    return v_existing;
+  end if;
+
+  select id, label into v_spot_id, v_label from parking_spots
+    where hotel_id = v_booking.hotel_id and status = 'available'
+    order by label
+    limit 1;
+
+  if v_spot_id is null then
+    return null;
+  end if;
+
+  update parking_spots set status = 'occupied', guest_name = v_booking.guest_name
+    where id = v_spot_id;
+
+  return v_label;
+end;
+$$;
+
+grant execute on function request_guest_parking(uuid) to anon, authenticated;
+
+create or replace function submit_guest_feedback(p_token uuid, p_message text)
+returns void
+language plpgsql
+security definer
+set search_path = public
+as $$
+declare
+  v_booking bookings%rowtype;
+begin
+  if coalesce(trim(p_message), '') = '' then
+    raise exception 'empty message';
+  end if;
+
+  select * into v_booking from bookings where guest_access_token = p_token;
+
+  if v_booking.id is null then
+    raise exception 'invalid token';
+  end if;
+
+  insert into tasks (hotel_id, room_id, type, status, notes)
+  values (
+    v_booking.hotel_id,
+    v_booking.room_id,
+    'maintenance',
+    'todo',
+    'Feedback oaspete (' || v_booking.guest_name || '): ' || trim(p_message)
+  );
+end;
+$$;
+
+grant execute on function submit_guest_feedback(uuid, text) to anon, authenticated;

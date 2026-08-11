@@ -11,6 +11,9 @@ export interface Hotel {
   id: string;
   name: string;
   monthly_revenue_target: number | null;
+  wifi_network: string | null;
+  wifi_password: string | null;
+  reception_phone: string | null;
   created_at: string;
 }
 
