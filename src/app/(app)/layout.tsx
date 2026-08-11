@@ -11,17 +11,20 @@ import {
   Heart,
 } from "lucide-react";
 import { requireProfile } from "@/lib/current-user";
+import { getDictionary } from "@/lib/i18n/get-locale";
+import { LanguageSwitcher } from "@/components/language-switcher";
 import { logout } from "../(auth)/actions";
 import { NavLink } from "./nav-link";
 
 export default async function AppLayout({ children }: { children: ReactNode }) {
   const { profile, hotel } = await requireProfile();
+  const { locale, t } = await getDictionary();
   const canManage = profile.role === "admin" || profile.role === "manager";
 
   return (
     <div className="flex min-h-screen bg-slate-50">
       <aside className="flex w-64 shrink-0 flex-col bg-gradient-to-b from-indigo-700 via-indigo-700 to-violet-800 p-4 shadow-xl print:hidden">
-        <div className="flex items-center gap-2.5 px-2 pb-6">
+        <div className="flex items-center gap-2.5 px-2 pb-4">
           <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-white/15 text-white">
             <BedDouble className="h-5 w-5" />
           </div>
@@ -31,32 +34,36 @@ export default async function AppLayout({ children }: { children: ReactNode }) {
           </div>
         </div>
 
+        <div className="px-2 pb-6">
+          <LanguageSwitcher locale={locale} />
+        </div>
+
         <nav className="flex flex-1 flex-col gap-1">
           <NavLink href="/" icon={<LayoutDashboard className="h-4 w-4" />}>
-            Dashboard
+            {t.nav.dashboard}
           </NavLink>
           <NavLink href="/rooms" icon={<DoorOpen className="h-4 w-4" />}>
-            Camere
+            {t.nav.rooms}
           </NavLink>
           {canManage && (
             <NavLink href="/bookings" icon={<CalendarDays className="h-4 w-4" />}>
-              Rezervări
+              {t.nav.bookings}
             </NavLink>
           )}
           {canManage && (
             <NavLink href="/guests" icon={<Heart className="h-4 w-4" />}>
-              Clienți fideli
+              {t.nav.guests}
             </NavLink>
           )}
           <NavLink href="/tasks" icon={<ClipboardList className="h-4 w-4" />}>
-            Housekeeping
+            {t.nav.housekeeping}
           </NavLink>
           <NavLink href="/staff" icon={<Users className="h-4 w-4" />}>
-            Personal
+            {t.nav.staff}
           </NavLink>
           {canManage && (
             <NavLink href="/reports" icon={<BarChart3 className="h-4 w-4" />}>
-              Rapoarte
+              {t.nav.reports}
             </NavLink>
           )}
         </nav>
@@ -71,7 +78,7 @@ export default async function AppLayout({ children }: { children: ReactNode }) {
               className="mt-2 flex w-full items-center gap-2.5 rounded-lg px-2 py-1.5 text-left text-sm text-indigo-100 hover:bg-white/10 hover:text-white"
             >
               <LogOut className="h-4 w-4" />
-              Deconectare
+              {t.nav.logout}
             </button>
           </form>
         </div>
