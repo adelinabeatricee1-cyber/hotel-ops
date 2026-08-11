@@ -75,6 +75,7 @@ export interface Booking {
   guest_id: string | null;
   loyalty_awarded: boolean;
   external_booking_id: string | null;
+  guest_access_token: string;
   created_at: string;
 }
 

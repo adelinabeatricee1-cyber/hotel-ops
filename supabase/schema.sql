@@ -449,3 +449,41 @@ alter table parking_spots enable row level security;
 drop policy if exists "parking_spots: all own hotel" on parking_spots;
 create policy "parking_spots: all own hotel" on parking_spots
   for all using (hotel_id = auth_hotel_id()) with check (hotel_id = auth_hotel_id());
+
+-- ---------------------------------------------------------------------------
+-- Guest-facing booking status page: a shareable, no-login link per booking
+-- (not a guest account/app — see get_booking_by_token() below).
+-- ---------------------------------------------------------------------------
+
+alter table bookings add column if not exists guest_access_token uuid not null default gen_random_uuid();
+
+create unique index if not exists bookings_guest_access_token_idx on bookings (guest_access_token);
+
+create or replace function get_booking_by_token(p_token uuid)
+returns table (
+  guest_name text,
+  checkin date,
+  checkout date,
+  room_number text,
+  price numeric,
+  amount_paid numeric,
+  payment_status text,
+  invoice_number int,
+  hotel_name text
+)
+language plpgsql
+security definer
+set search_path = public
+as $$
+begin
+  return query
+    select b.guest_name, b.checkin, b.checkout, r.number, b.price, b.amount_paid,
+           b.payment_status, b.invoice_number, h.name
+    from bookings b
+    left join rooms r on r.id = b.room_id
+    join hotels h on h.id = b.hotel_id
+    where b.guest_access_token = p_token;
+end;
+$$;
+
+grant execute on function get_booking_by_token(uuid) to anon, authenticated;

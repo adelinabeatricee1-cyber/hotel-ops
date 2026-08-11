@@ -2,7 +2,7 @@
 
 import { useState, useTransition } from "react";
 import Link from "next/link";
-import { Trash2, Receipt, ExternalLink } from "lucide-react";
+import { Trash2, Receipt, ExternalLink, Link2, Check } from "lucide-react";
 import type { BookingWithRoom, PaymentStatus } from "@/types/database";
 import { deleteBooking, setPaymentStatus } from "./actions";
 import { PAYMENT_STATUS_LABELS, PAYMENT_STATUS_STYLES, SOURCE_ICONS, SOURCE_LABELS } from "./labels";
@@ -16,7 +16,15 @@ function formatDate(value: string) {
 export function BookingRow({ booking }: { booking: BookingWithRoom }) {
   const [isPending, startTransition] = useTransition();
   const [amountPaid, setAmountPaid] = useState(String(booking.amount_paid ?? 0));
+  const [linkCopied, setLinkCopied] = useState(false);
   const SourceIcon = SOURCE_ICONS[booking.source];
+
+  function handleCopyGuestLink() {
+    const link = `${window.location.origin}/my-booking/${booking.guest_access_token}`;
+    navigator.clipboard.writeText(link);
+    setLinkCopied(true);
+    setTimeout(() => setLinkCopied(false), 2000);
+  }
 
   function handlePaymentStatusChange(status: PaymentStatus) {
     let amount = Number(amountPaid) || 0;
@@ -109,6 +117,15 @@ export function BookingRow({ booking }: { booking: BookingWithRoom }) {
       </td>
       <td className="py-3 text-right">
         <div className="flex items-center justify-end gap-3">
+          <button
+            type="button"
+            onClick={handleCopyGuestLink}
+            className="inline-flex items-center gap-1 text-xs font-medium text-slate-500 hover:text-slate-700"
+            title="Copiază link-ul pentru oaspete"
+          >
+            {linkCopied ? <Check className="h-3.5 w-3.5" /> : <Link2 className="h-3.5 w-3.5" />}
+            {linkCopied ? "Copiat" : "Link oaspete"}
+          </button>
           <Link
             href={`/bookings/${booking.id}/invoice`}
             className="inline-flex items-center gap-1 text-xs font-medium text-indigo-600 hover:text-indigo-700"

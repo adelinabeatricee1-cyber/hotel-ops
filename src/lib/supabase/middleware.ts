@@ -6,7 +6,7 @@ const PUBLIC_ONLY_PATHS = ["/login", "/signup"];
 // Reachable without an active session, but not force-redirected away from
 // when authenticated (e.g. /join, which an already-signed-in user might
 // still open by mistake or intentionally).
-const PUBLIC_PATHS = [...PUBLIC_ONLY_PATHS, "/join"];
+const PUBLIC_PATHS = [...PUBLIC_ONLY_PATHS, "/join", "/my-booking"];
 
 export async function updateSession(request: NextRequest) {
   let supabaseResponse = NextResponse.next({ request });
