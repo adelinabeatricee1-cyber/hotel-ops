@@ -97,6 +97,17 @@ export function CreateBookingForm({ rooms, guests }: { rooms: Room[]; guests: Gu
         </select>
       </div>
       <div>
+        <label htmlFor="external_booking_id" className="block text-xs font-medium text-slate-600">
+          ID Booking.com
+        </label>
+        <input
+          id="external_booking_id"
+          name="external_booking_id"
+          placeholder="opțional"
+          className="mt-1 w-32 rounded-lg border border-slate-300 px-2 py-1.5 text-sm shadow-sm focus:border-indigo-500 focus:outline-none focus:ring-2 focus:ring-indigo-500/20"
+        />
+      </div>
+      <div>
         <label htmlFor="guest_id" className="block text-xs font-medium text-slate-600">
           Client fidel
         </label>

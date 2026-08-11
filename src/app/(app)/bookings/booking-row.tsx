@@ -2,7 +2,7 @@
 
 import { useState, useTransition } from "react";
 import Link from "next/link";
-import { Trash2, Receipt } from "lucide-react";
+import { Trash2, Receipt, ExternalLink } from "lucide-react";
 import type { BookingWithRoom, PaymentStatus } from "@/types/database";
 import { deleteBooking, setPaymentStatus } from "./actions";
 import { PAYMENT_STATUS_LABELS, PAYMENT_STATUS_STYLES, SOURCE_ICONS, SOURCE_LABELS } from "./labels";
@@ -53,6 +53,22 @@ export function BookingRow({ booking }: { booking: BookingWithRoom }) {
           <SourceIcon className="h-3 w-3" />
           {SOURCE_LABELS[booking.source]}
         </span>
+        {booking.external_booking_id && (
+          <div className="mt-1 text-xs text-slate-500">
+            ID: {booking.external_booking_id}
+            {booking.source === "booking" && (
+              <a
+                href="https://admin.booking.com/"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="ml-1.5 inline-flex items-center gap-0.5 text-indigo-600 hover:text-indigo-700"
+              >
+                <ExternalLink className="h-3 w-3" />
+                extranet
+              </a>
+            )}
+          </div>
+        )}
       </td>
       <td className="py-3 pr-4 text-sm font-medium text-slate-900">
         {booking.price !== null ? `${booking.price.toFixed(2)} RON` : "—"}

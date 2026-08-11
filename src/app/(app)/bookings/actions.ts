@@ -20,6 +20,7 @@ export async function createBooking(
   const source = String(formData.get("source") ?? "direct") as BookingSource;
   const priceRaw = String(formData.get("price") ?? "").trim();
   const guestId = String(formData.get("guest_id") ?? "").trim();
+  const externalBookingId = String(formData.get("external_booking_id") ?? "").trim();
 
   if (!roomId || !guestName || !checkin || !checkout) {
     return { error: "Cameră, nume oaspete și datele de check-in/check-out sunt obligatorii." };
@@ -55,6 +56,7 @@ export async function createBooking(
     source,
     price: priceRaw ? Number(priceRaw) : null,
     guest_id: guestId || null,
+    external_booking_id: externalBookingId || null,
   });
 
   if (error) {

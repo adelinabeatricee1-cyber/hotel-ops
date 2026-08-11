@@ -410,3 +410,11 @@ create trigger trg_booking_paid
   before update on bookings
   for each row
   execute function handle_booking_paid();
+
+-- ---------------------------------------------------------------------------
+-- Booking.com reference: no real sync (that requires Booking.com's
+-- Connectivity partner API, which isn't self-serve), just a place to keep
+-- their reservation ID for manual lookup in the Booking.com extranet.
+-- ---------------------------------------------------------------------------
+
+alter table bookings add column if not exists external_booking_id text;

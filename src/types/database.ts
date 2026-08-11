@@ -72,6 +72,7 @@ export interface Booking {
   invoice_issued_at: string | null;
   guest_id: string | null;
   loyalty_awarded: boolean;
+  external_booking_id: string | null;
   created_at: string;
 }
 
