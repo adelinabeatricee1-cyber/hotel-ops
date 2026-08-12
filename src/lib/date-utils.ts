@@ -71,3 +71,8 @@ export function isWeekend(dateStr: string) {
   const day = new Date(`${dateStr}T00:00:00Z`).getUTCDay();
   return day === 0 || day === 6;
 }
+
+export function todayDateString() {
+  const now = new Date();
+  return `${now.getFullYear()}-${pad(now.getMonth() + 1)}-${pad(now.getDate())}`;
+}

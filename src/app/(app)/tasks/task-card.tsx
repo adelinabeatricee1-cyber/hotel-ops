@@ -1,7 +1,7 @@
 "use client";
 
 import { useTransition } from "react";
-import { Trash2, User } from "lucide-react";
+import { AlertTriangle, Clock3, Trash2, User } from "lucide-react";
 import type { TaskStatus, TaskWithRelations } from "@/types/database";
 import { deleteTask, setTaskStatus } from "./actions";
 import {
@@ -12,9 +12,18 @@ import {
   TASK_TYPE_LABELS,
 } from "./labels";
 
-export function TaskCard({ task }: { task: TaskWithRelations }) {
+export function TaskCard({
+  task,
+  dueOut = false,
+  turnover = false,
+}: {
+  task: TaskWithRelations;
+  dueOut?: boolean;
+  turnover?: boolean;
+}) {
   const [isPending, startTransition] = useTransition();
   const TypeIcon = TASK_TYPE_ICONS[task.type];
+  const isPriority = task.status !== "done" && (dueOut || turnover);
 
   function handleStatusChange(status: TaskStatus) {
     startTransition(() => setTaskStatus(task.id, status));
@@ -27,8 +36,25 @@ export function TaskCard({ task }: { task: TaskWithRelations }) {
 
   return (
     <div
-      className={`rounded-xl border border-slate-100 border-t-4 bg-white p-4 shadow-sm transition hover:shadow-md ${TASK_STATUS_BORDER[task.status]}`}
+      className={`rounded-xl border bg-white p-4 shadow-sm transition hover:shadow-md ${
+        isPriority
+          ? turnover
+            ? "border-red-200 border-t-4 border-t-red-500 ring-1 ring-red-100"
+            : "border-amber-200 border-t-4 border-t-amber-500 ring-1 ring-amber-100"
+          : `border-slate-100 border-t-4 ${TASK_STATUS_BORDER[task.status]}`
+      }`}
     >
+      {isPriority && (
+        <div
+          className={`mb-2 inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-[11px] font-semibold ${
+            turnover ? "bg-red-100 text-red-700" : "bg-amber-100 text-amber-700"
+          }`}
+        >
+          {turnover ? <AlertTriangle className="h-3 w-3" /> : <Clock3 className="h-3 w-3" />}
+          {turnover ? "Turnover azi — sosire nouă!" : "Prioritate — eliberare azi"}
+        </div>
+      )}
+
       <div className="flex items-start justify-between">
         <div>
           <p className="text-sm font-bold text-slate-900">Camera {task.room?.number ?? "—"}</p>
