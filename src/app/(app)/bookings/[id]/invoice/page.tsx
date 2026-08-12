@@ -3,8 +3,9 @@ import { notFound } from "next/navigation";
 import { ArrowLeft, BedDouble } from "lucide-react";
 import { createClient } from "@/lib/supabase/server";
 import { requireAdmin } from "@/lib/current-user";
-import type { BookingWithRoom } from "@/types/database";
+import type { BookingAddon, BookingWithRoom } from "@/types/database";
 import { PAYMENT_STATUS_LABELS, PAYMENT_STATUS_STYLES, SOURCE_LABELS } from "../../labels";
+import { AddonsManager } from "./addons-manager";
 import { PrintButton } from "./print-button";
 
 function formatDate(value: string) {
@@ -33,7 +34,18 @@ export default async function InvoicePage({ params }: { params: Promise<{ id: st
     notFound();
   }
 
+  const { data: addons } = await supabase
+    .from("booking_addons")
+    .select("*")
+    .eq("booking_id", id)
+    .order("created_at")
+    .returns<BookingAddon[]>();
+
+  const addonsList = addons ?? [];
+  const addonsTotal = addonsList.reduce((sum, a) => sum + a.unit_price * a.quantity, 0);
+
   const price = booking.price ?? 0;
+  const roomPrice = price - addonsTotal;
   const due = Math.max(price - booking.amount_paid, 0);
   const nights = Math.max(
     Math.round(
@@ -112,9 +124,19 @@ export default async function InvoicePage({ params }: { params: Promise<{ id: st
                 {nights === 1 ? "noapte" : "nopți"})
               </td>
               <td className="py-3 text-right font-medium text-slate-900">
-                {price.toFixed(2)} RON
+                {roomPrice.toFixed(2)} RON
               </td>
             </tr>
+            {addonsList.map((addon) => (
+              <tr key={addon.id} className="border-b border-slate-100">
+                <td className="py-3 text-slate-700">
+                  {addon.name} {addon.quantity > 1 && `× ${addon.quantity}`}
+                </td>
+                <td className="py-3 text-right font-medium text-slate-900">
+                  {(addon.unit_price * addon.quantity).toFixed(2)} RON
+                </td>
+              </tr>
+            ))}
           </tbody>
         </table>
 
@@ -146,6 +168,8 @@ export default async function InvoicePage({ params }: { params: Promise<{ id: st
           <p className="text-xs text-slate-400">Generat prin Hotel Ops</p>
         </div>
       </div>
+
+      <AddonsManager bookingId={id} addons={addonsList} />
     </div>
   );
 }

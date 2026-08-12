@@ -114,6 +114,16 @@ export interface Guest {
   created_at: string;
 }
 
+export interface BookingAddon {
+  id: string;
+  hotel_id: string;
+  booking_id: string;
+  name: string;
+  unit_price: number;
+  quantity: number;
+  created_at: string;
+}
+
 export interface Supply {
   id: string;
   hotel_id: string;

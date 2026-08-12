@@ -1301,3 +1301,32 @@ create policy "hotel-covers: authenticated delete own" on storage.objects
 drop policy if exists "hotel-covers: public read" on storage.objects;
 create policy "hotel-covers: public read" on storage.objects
   for select using (bucket_id = 'hotel-covers');
+
+-- ---------------------------------------------------------------------------
+-- Booking add-ons (breakfast, late check-out, extra bed, etc.). Each addon
+-- row is a name+price snapshot so past invoices stay accurate even if the
+-- hotel changes its usual pricing later. bookings.price stays the single
+-- source of truth for "total owed" — adding/removing an addon adjusts it by
+-- the delta, so every existing balance/revenue calculation elsewhere in the
+-- app keeps working unchanged.
+-- ---------------------------------------------------------------------------
+
+create table if not exists booking_addons (
+  id uuid primary key default gen_random_uuid(),
+  hotel_id uuid not null references hotels (id) on delete cascade,
+  booking_id uuid not null references bookings (id) on delete cascade,
+  name text not null,
+  unit_price numeric(10, 2) not null,
+  quantity int not null default 1,
+  created_at timestamptz not null default now()
+);
+
+create index if not exists booking_addons_booking_id_idx on booking_addons (booking_id);
+
+alter table booking_addons enable row level security;
+
+drop policy if exists "booking_addons: admin/manager own hotel" on booking_addons;
+create policy "booking_addons: admin/manager own hotel" on booking_addons
+  for all
+  using (hotel_id = auth_hotel_id() and auth_role() in ('admin', 'manager'))
+  with check (hotel_id = auth_hotel_id() and auth_role() in ('admin', 'manager'));
