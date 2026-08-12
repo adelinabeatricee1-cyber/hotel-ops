@@ -1,7 +1,8 @@
 "use client";
 
 import { useState, useTransition } from "react";
-import { Trash2 } from "lucide-react";
+import Link from "next/link";
+import { Tag, Trash2 } from "lucide-react";
 import type { Room, RoomStatus } from "@/types/database";
 import { deleteRoom, setNightlyRate, setRoomStatus } from "./actions";
 import { ROOM_STATUS_BORDER, ROOM_STATUS_LABELS, RoomStatusBadge } from "./status-badge";
@@ -73,15 +74,28 @@ export function RoomCard({ room }: { room: Room }) {
         <span className="text-xs text-slate-500">RON</span>
       </div>
 
-      <button
-        type="button"
-        onClick={handleDelete}
-        disabled={isPending}
-        className="mt-3 inline-flex items-center gap-1 text-xs font-medium text-red-500 hover:text-red-600 disabled:opacity-40"
-      >
-        <Trash2 className="h-3 w-3" />
-        Șterge camera
-      </button>
+      <div className="mt-3 flex items-center justify-between">
+        {room.nightly_rate !== null ? (
+          <Link
+            href={`/rooms/${room.id}/rates`}
+            className="inline-flex items-center gap-1 text-xs font-medium text-olive-700 hover:text-olive-900"
+          >
+            <Tag className="h-3 w-3" />
+            Tarife pe zile
+          </Link>
+        ) : (
+          <span />
+        )}
+        <button
+          type="button"
+          onClick={handleDelete}
+          disabled={isPending}
+          className="inline-flex items-center gap-1 text-xs font-medium text-red-500 hover:text-red-600 disabled:opacity-40"
+        >
+          <Trash2 className="h-3 w-3" />
+          Șterge camera
+        </button>
+      </div>
     </div>
   );
 }

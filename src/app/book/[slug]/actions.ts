@@ -7,6 +7,7 @@ export interface AvailableRoom {
   number: string;
   type: string | null;
   nightly_rate: number;
+  total_price: number;
 }
 
 export async function searchAvailability(

@@ -124,3 +124,12 @@ export interface Invite {
   used_at: string | null;
   used_by: string | null;
 }
+
+export interface RoomRateOverride {
+  id: string;
+  hotel_id: string;
+  room_id: string;
+  date: string;
+  rate: number;
+  created_at: string;
+}

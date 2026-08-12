@@ -83,7 +83,7 @@ export function BookingWidget({ slug, hotelName }: { slug: string; hotelName: st
           Camera {selectedRoom?.number} · {formatDate(checkin)} → {formatDate(checkout)}
         </p>
         <p className="mt-1 text-sm text-stone-500">
-          Total: {((selectedRoom?.nightly_rate ?? 0) * nights).toFixed(2)} RON
+          Total: {(selectedRoom?.total_price ?? 0).toFixed(2)} RON
         </p>
         <Link
           href={`/my-booking/${token}`}
@@ -176,10 +176,11 @@ export function BookingWidget({ slug, hotelName }: { slug: string; hotelName: st
                     </div>
                   </div>
                   <div className="text-right">
-                    <p className="font-semibold text-stone-900">
-                      {(room.nightly_rate * nights).toFixed(2)} RON
+                    <p className="font-semibold text-stone-900">{room.total_price.toFixed(2)} RON</p>
+                    <p className="text-xs text-stone-500">
+                      {nights > 0 ? (room.total_price / nights).toFixed(2) : room.nightly_rate.toFixed(2)}{" "}
+                      RON/noapte în medie
                     </p>
-                    <p className="text-xs text-stone-500">{room.nightly_rate.toFixed(2)} RON/noapte</p>
                     <button
                       type="button"
                       onClick={() => handleSelectRoom(room)}
@@ -207,7 +208,7 @@ export function BookingWidget({ slug, hotelName }: { slug: string; hotelName: st
           </button>
           <div className="rounded-xl bg-[#f6e9ec] p-3 text-sm text-[#5a1e33]">
             Camera {selectedRoom.number} · {formatDate(checkin)} → {formatDate(checkout)} ·{" "}
-            {(selectedRoom.nightly_rate * nights).toFixed(2)} RON total
+            {selectedRoom.total_price.toFixed(2)} RON total
           </div>
           <div>
             <label htmlFor="guest_name" className="block text-xs font-medium text-stone-600">

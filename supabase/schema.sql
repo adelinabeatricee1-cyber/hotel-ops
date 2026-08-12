@@ -608,6 +608,162 @@ $$;
 grant execute on function create_direct_booking(text, uuid, date, date, text, text) to anon, authenticated;
 
 -- ---------------------------------------------------------------------------
+-- Dynamic per-date pricing: an admin can override a room's default
+-- nightly_rate for specific dates (weekends, holidays, events).
+-- ---------------------------------------------------------------------------
+
+create table if not exists room_rate_overrides (
+  id uuid primary key default gen_random_uuid(),
+  hotel_id uuid not null references hotels (id) on delete cascade,
+  room_id uuid not null references rooms (id) on delete cascade,
+  date date not null,
+  rate numeric(10, 2) not null,
+  created_at timestamptz not null default now(),
+  unique (room_id, date)
+);
+
+create index if not exists room_rate_overrides_room_id_idx on room_rate_overrides (room_id);
+
+alter table room_rate_overrides enable row level security;
+
+drop policy if exists "room_rate_overrides: admin/manager own hotel" on room_rate_overrides;
+create policy "room_rate_overrides: admin/manager own hotel" on room_rate_overrides
+  for all
+  using (hotel_id = auth_hotel_id() and auth_role() in ('admin', 'manager'))
+  with check (hotel_id = auth_hotel_id() and auth_role() in ('admin', 'manager'));
+
+-- Sums the resolved per-night rate (override if set, else the room's
+-- default nightly_rate) across a stay. Returns null if the room has no
+-- default rate (i.e. isn't bookable online at all).
+create or replace function calc_room_price(p_room_id uuid, p_checkin date, p_checkout date)
+returns numeric
+language plpgsql
+security definer
+stable
+set search_path = public
+as $$
+declare
+  v_default numeric;
+  v_total numeric := 0;
+  v_day date;
+  v_rate numeric;
+begin
+  select nightly_rate into v_default from rooms where id = p_room_id;
+  if v_default is null then
+    return null;
+  end if;
+
+  v_day := p_checkin;
+  while v_day < p_checkout loop
+    select rate into v_rate from room_rate_overrides
+      where room_id = p_room_id and date = v_day;
+    v_total := v_total + coalesce(v_rate, v_default);
+    v_day := v_day + 1;
+  end loop;
+
+  return v_total;
+end;
+$$;
+
+grant execute on function calc_room_price(uuid, date, date) to anon, authenticated;
+
+drop function if exists get_available_rooms(text, date, date);
+
+create or replace function get_available_rooms(p_slug text, p_checkin date, p_checkout date)
+returns table (room_id uuid, number text, type text, nightly_rate numeric, total_price numeric)
+language plpgsql
+security definer
+stable
+set search_path = public
+as $$
+declare
+  v_hotel_id uuid;
+begin
+  select id into v_hotel_id from hotels where booking_slug = p_slug;
+
+  if v_hotel_id is null then
+    return;
+  end if;
+
+  return query
+    select r.id, r.number, r.type, r.nightly_rate, calc_room_price(r.id, p_checkin, p_checkout)
+    from rooms r
+    where r.hotel_id = v_hotel_id
+      and r.nightly_rate is not null
+      and not exists (
+        select 1 from bookings b
+        where b.room_id = r.id
+          and b.status <> 'cancelled'
+          and b.checkin < p_checkout
+          and b.checkout > p_checkin
+      )
+    order by r.nightly_rate;
+end;
+$$;
+
+grant execute on function get_available_rooms(text, date, date) to anon, authenticated;
+
+create or replace function create_direct_booking(
+  p_slug text,
+  p_room_id uuid,
+  p_checkin date,
+  p_checkout date,
+  p_guest_name text,
+  p_phone text
+)
+returns uuid
+language plpgsql
+security definer
+set search_path = public
+as $$
+declare
+  v_hotel_id uuid;
+  v_price numeric;
+  v_token uuid;
+begin
+  if p_checkout <= p_checkin then
+    raise exception 'invalid dates';
+  end if;
+
+  if coalesce(trim(p_guest_name), '') = '' then
+    raise exception 'guest name required';
+  end if;
+
+  select id into v_hotel_id from hotels where booking_slug = p_slug;
+  if v_hotel_id is null then
+    raise exception 'invalid hotel';
+  end if;
+
+  if not exists (select 1 from rooms where id = p_room_id and hotel_id = v_hotel_id) then
+    raise exception 'invalid room';
+  end if;
+
+  v_price := calc_room_price(p_room_id, p_checkin, p_checkout);
+  if v_price is null then
+    raise exception 'room not bookable';
+  end if;
+
+  if exists (
+    select 1 from bookings b
+    where b.room_id = p_room_id
+      and b.status <> 'cancelled'
+      and b.checkin < p_checkout
+      and b.checkout > p_checkin
+  ) then
+    raise exception 'room no longer available for these dates';
+  end if;
+
+  insert into bookings (hotel_id, room_id, guest_name, phone, checkin, checkout, source, status, price)
+  values (v_hotel_id, p_room_id, trim(p_guest_name), nullif(trim(p_phone), ''), p_checkin, p_checkout, 'direct', 'confirmed', v_price)
+  returning guest_access_token into v_token;
+
+  return v_token;
+end;
+$$;
+
+grant execute on function create_direct_booking(text, uuid, date, date, text, text) to anon, authenticated;
+
+-- ---------------------------------------------------------------------------
 -- Guest portal v2: hotel-wide guest info (Wi-Fi, reception contact) plus
 -- token-scoped actions a guest can trigger without an account. Each RPC
 -- re-derives hotel_id/room_id from the booking's token server-side, so a
