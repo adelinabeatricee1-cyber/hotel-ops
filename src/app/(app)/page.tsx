@@ -26,6 +26,7 @@ import { requireProfile } from "@/lib/current-user";
 import { getDictionary } from "@/lib/i18n/get-locale";
 import { resolveMonth, todayDateString } from "@/lib/date-utils";
 import type { RoomStatus, Supply, TaskStatus } from "@/types/database";
+import { DailyDigestButton } from "./daily-digest-button";
 import { TargetCard } from "./reports/target-card";
 import { ensureCheckoutHousekeepingTasks } from "./tasks/actions";
 
@@ -247,6 +248,27 @@ export default async function DashboardPage() {
               <p className="text-xs text-slate-500">Persoane în tură azi</p>
             </div>
           </div>
+          {canSeePayments && (
+            <div className="mt-4 max-w-sm">
+              <DailyDigestButton
+                data={{
+                  hotelName: hotel.name,
+                  dateLabel: formatToday(),
+                  arrivalsN: arrivalsN ?? 0,
+                  departuresN: departuresN ?? 0,
+                  occupancyRate,
+                  amountDue,
+                  unpaidCount,
+                  lowStockItems: lowStockItems.map((s) => ({
+                    name: s.name,
+                    quantity: s.quantity,
+                    unit: s.unit,
+                  })),
+                }}
+                defaultPhone={hotel.reception_phone}
+              />
+            </div>
+          )}
         </section>
 
       <section className="mt-8">
