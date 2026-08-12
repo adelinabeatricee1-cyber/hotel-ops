@@ -4,7 +4,8 @@ import { createClient } from "@/lib/supabase/server";
 import { requireAdmin } from "@/lib/current-user";
 import { lastMonths, resolveMonth } from "@/lib/date-utils";
 import type { BookingSource } from "@/types/database";
-import { SOURCE_LABELS } from "../bookings/labels";
+import { PAYMENT_STATUS_LABELS, SOURCE_LABELS } from "../bookings/labels";
+import { ExportButtons, type ExportRow } from "./export-buttons";
 import { TargetCard } from "./target-card";
 import { TrendChart } from "./trend-chart";
 
@@ -109,13 +110,37 @@ export default async function ReportsPage({
     revpar: (totalRooms ?? 0) > 0 ? b.revenue / ((totalRooms ?? 0) * b.daysInMonth) : 0,
   }));
 
+  const { data: exportBookings } = await supabase
+    .from("bookings")
+    .select("guest_name, checkin, checkout, source, price, payment_status, room:rooms(number)")
+    .neq("status", "cancelled")
+    .gte("checkin", range.startDate)
+    .lte("checkin", range.endDate)
+    .order("checkin");
+
+  const exportRows: ExportRow[] = (exportBookings ?? []).map((b) => {
+    const room = Array.isArray(b.room) ? b.room[0] : b.room;
+    return {
+      guest_name: b.guest_name,
+      room_number: room?.number ?? "",
+      checkin: b.checkin,
+      checkout: b.checkout,
+      source: SOURCE_LABELS[b.source as BookingSource],
+      price: b.price ?? 0,
+      payment_status: PAYMENT_STATUS_LABELS[b.payment_status as keyof typeof PAYMENT_STATUS_LABELS],
+    };
+  });
+
   return (
     <div>
-      <div className="flex items-center gap-2.5">
-        <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-olive-100 text-olive-700">
-          <BarChart3 className="h-5 w-5" />
+      <div className="flex items-center justify-between">
+        <div className="flex items-center gap-2.5">
+          <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-olive-100 text-olive-700">
+            <BarChart3 className="h-5 w-5" />
+          </div>
+          <h1 className="text-2xl font-bold text-slate-900">Rapoarte</h1>
         </div>
-        <h1 className="text-2xl font-bold text-slate-900">Rapoarte</h1>
+        <ExportButtons monthLabel={range.label} rows={exportRows} />
       </div>
 
       <div className="mt-5 flex items-center justify-between rounded-xl border border-slate-100 bg-white px-4 py-3 shadow-sm">
