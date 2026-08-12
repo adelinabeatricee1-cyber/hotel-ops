@@ -1,18 +1,26 @@
 "use client";
 
 import { useState, useTransition } from "react";
-import { CheckSquare, Square, X } from "lucide-react";
+import { CheckSquare, LayoutGrid, Square, X } from "lucide-react";
 import type { Room, RoomStatus } from "@/types/database";
 import { setRoomStatusBulk } from "./actions";
 import { ROOM_STATUS_LABELS } from "./status-badge";
 import { RoomCard } from "./room-card";
+import { RoomFloorPlan } from "./room-floor-plan";
 
 const STATUS_ORDER: RoomStatus[] = ["clean", "dirty", "inprogress", "blocked"];
 
-export function RoomsGrid({ rooms }: { rooms: Room[] }) {
+export function RoomsGrid({
+  rooms,
+  occupiedRoomIds,
+}: {
+  rooms: Room[];
+  occupiedRoomIds: Set<string>;
+}) {
   const [isPending, startTransition] = useTransition();
   const [selectMode, setSelectMode] = useState(false);
   const [selected, setSelected] = useState<Set<string>>(new Set());
+  const [view, setView] = useState<"list" | "map">("list");
 
   function toggleSelect(roomId: string) {
     setSelected((prev) => {
@@ -42,14 +50,33 @@ export function RoomsGrid({ rooms }: { rooms: Room[] }) {
   return (
     <div>
       <div className="mt-4 flex items-center justify-between">
-        <button
-          type="button"
-          onClick={() => (selectMode ? exitSelectMode() : setSelectMode(true))}
-          className="inline-flex items-center gap-1.5 text-xs font-medium text-slate-500 hover:text-slate-700"
-        >
-          {selectMode ? <X className="h-3.5 w-3.5" /> : <CheckSquare className="h-3.5 w-3.5" />}
-          {selectMode ? "Anulează selecția" : "Selectează mai multe"}
-        </button>
+        <div className="flex items-center gap-3">
+          <button
+            type="button"
+            onClick={() => (selectMode ? exitSelectMode() : setSelectMode(true))}
+            className="inline-flex items-center gap-1.5 text-xs font-medium text-slate-500 hover:text-slate-700"
+          >
+            {selectMode ? <X className="h-3.5 w-3.5" /> : <CheckSquare className="h-3.5 w-3.5" />}
+            {selectMode ? "Anulează selecția" : "Selectează mai multe"}
+          </button>
+          <div className="flex rounded-lg border border-slate-200 bg-white p-0.5 text-xs font-medium">
+            <button
+              type="button"
+              onClick={() => setView("list")}
+              className={`rounded-md px-2.5 py-1 ${view === "list" ? "bg-olive-100 text-olive-800" : "text-slate-500 hover:text-slate-700"}`}
+            >
+              Listă
+            </button>
+            <button
+              type="button"
+              onClick={() => setView("map")}
+              className={`inline-flex items-center gap-1 rounded-md px-2.5 py-1 ${view === "map" ? "bg-olive-100 text-olive-800" : "text-slate-500 hover:text-slate-700"}`}
+            >
+              <LayoutGrid className="h-3 w-3" />
+              Hartă
+            </button>
+          </div>
+        </div>
         {selectMode && (
           <button
             type="button"
@@ -80,7 +107,9 @@ export function RoomsGrid({ rooms }: { rooms: Room[] }) {
         </div>
       )}
 
-      {rooms.length > 0 ? (
+      {view === "map" ? (
+        <RoomFloorPlan rooms={rooms} occupiedRoomIds={occupiedRoomIds} />
+      ) : rooms.length > 0 ? (
         <div className="mt-4 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
           {rooms.map((room) => (
             <RoomCard

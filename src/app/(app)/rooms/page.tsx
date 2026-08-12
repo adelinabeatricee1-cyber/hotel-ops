@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { DoorOpen } from "lucide-react";
 import { createClient } from "@/lib/supabase/server";
+import { todayDateString } from "@/lib/date-utils";
 import type { Room, RoomStatus } from "@/types/database";
 import { AddRoomForm } from "./add-room-form";
 import { RoomsGrid } from "./rooms-grid";
@@ -15,13 +16,26 @@ export default async function RoomsPage({
 }) {
   const { status } = await searchParams;
   const supabase = await createClient();
+  const today = todayDateString();
 
   let query = supabase.from("rooms").select("*").order("floor").order("number");
   if (status && STATUS_FILTERS.includes(status as RoomStatus)) {
     query = query.eq("status", status);
   }
 
-  const { data: rooms } = await query.returns<Room[]>();
+  const [{ data: rooms }, { data: occupiedBookings }] = await Promise.all([
+    query.returns<Room[]>(),
+    supabase
+      .from("bookings")
+      .select("room_id")
+      .neq("status", "cancelled")
+      .lte("checkin", today)
+      .gt("checkout", today),
+  ]);
+
+  const occupiedRoomIds = new Set(
+    (occupiedBookings ?? []).map((b) => b.room_id).filter((id): id is string => Boolean(id)),
+  );
 
   return (
     <div>
@@ -47,7 +61,7 @@ export default async function RoomsPage({
         ))}
       </div>
 
-      <RoomsGrid rooms={rooms ?? []} />
+      <RoomsGrid rooms={rooms ?? []} occupiedRoomIds={occupiedRoomIds} />
     </div>
   );
 }
