@@ -108,6 +108,16 @@ export interface Guest {
   created_at: string;
 }
 
+export interface Supply {
+  id: string;
+  hotel_id: string;
+  name: string;
+  unit: string;
+  quantity: number;
+  low_stock_threshold: number;
+  created_at: string;
+}
+
 export interface ParkingSpot {
   id: string;
   hotel_id: string;

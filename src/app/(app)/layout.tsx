@@ -10,6 +10,7 @@ import {
   BarChart3,
   Heart,
   SquareParking,
+  Package,
   Settings,
 } from "lucide-react";
 import { requireProfile } from "@/lib/current-user";
@@ -65,6 +66,9 @@ export default async function AppLayout({ children }: { children: ReactNode }) {
           </NavLink>
           <NavLink href="/staff" icon={<Users className="h-4 w-4" />}>
             {t.nav.staff}
+          </NavLink>
+          <NavLink href="/supplies" icon={<Package className="h-4 w-4" />}>
+            {t.nav.supplies}
           </NavLink>
           {canManage && (
             <NavLink href="/reports" icon={<BarChart3 className="h-4 w-4" />}>

@@ -947,3 +947,27 @@ create policy "task-photos: authenticated insert" on storage.objects
 drop policy if exists "task-photos: public read" on storage.objects;
 create policy "task-photos: public read" on storage.objects
   for select using (bucket_id = 'task-photos');
+
+-- ---------------------------------------------------------------------------
+-- Supply inventory: everyday consumables (towels, soap, cleaning products)
+-- tracked per hotel, same operational access model as rooms/tasks/parking.
+-- ---------------------------------------------------------------------------
+
+create table if not exists supplies (
+  id uuid primary key default gen_random_uuid(),
+  hotel_id uuid not null references hotels (id) on delete cascade,
+  name text not null,
+  unit text not null default 'buc',
+  quantity int not null default 0,
+  low_stock_threshold int not null default 5,
+  created_at timestamptz not null default now(),
+  unique (hotel_id, name)
+);
+
+create index if not exists supplies_hotel_id_idx on supplies (hotel_id);
+
+alter table supplies enable row level security;
+
+drop policy if exists "supplies: all own hotel" on supplies;
+create policy "supplies: all own hotel" on supplies
+  for all using (hotel_id = auth_hotel_id()) with check (hotel_id = auth_hotel_id());
