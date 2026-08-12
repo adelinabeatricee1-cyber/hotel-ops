@@ -42,6 +42,10 @@ export function TaskCard({
     const file = e.target.files?.[0];
     e.target.value = "";
     if (!file) return;
+    if (file.size > 9 * 1024 * 1024) {
+      setPhotoError("Poza e prea mare (max 9MB). Încearcă o poză mai mică sau comprimată.");
+      return;
+    }
     const formData = new FormData();
     formData.append("photo", file);
     setPhotoError(null);

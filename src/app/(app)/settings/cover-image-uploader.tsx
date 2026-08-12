@@ -17,6 +17,11 @@ export function CoverImageUploader({ coverImageUrl }: { coverImageUrl: string | 
     e.target.value = "";
     if (!file) return;
 
+    if (file.size > 9 * 1024 * 1024) {
+      setError("Poza e prea mare (max 9MB). Încearcă o poză mai mică sau comprimată.");
+      return;
+    }
+
     const formData = new FormData();
     formData.append("photo", file);
     setError(null);
