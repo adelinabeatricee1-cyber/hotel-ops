@@ -9,7 +9,15 @@ import { ROOM_STATUS_BORDER, ROOM_STATUS_LABELS, RoomStatusBadge } from "./statu
 
 const STATUS_ORDER: RoomStatus[] = ["clean", "dirty", "inprogress", "blocked"];
 
-export function RoomCard({ room }: { room: Room }) {
+export function RoomCard({
+  room,
+  selected = false,
+  onToggleSelect,
+}: {
+  room: Room;
+  selected?: boolean;
+  onToggleSelect?: (roomId: string) => void;
+}) {
   const [isPending, startTransition] = useTransition();
   const [rate, setRate] = useState(room.nightly_rate !== null ? String(room.nightly_rate) : "");
 
@@ -32,12 +40,23 @@ export function RoomCard({ room }: { room: Room }) {
       className={`rounded-xl border border-slate-100 border-t-4 bg-white p-4 shadow-sm transition hover:shadow-md ${ROOM_STATUS_BORDER[room.status]}`}
     >
       <div className="flex items-start justify-between">
-        <div>
-          <p className="text-lg font-bold text-slate-900">Camera {room.number}</p>
-          <p className="text-xs text-slate-500">
-            {room.type ? `${room.type} · ` : ""}
-            {room.floor !== null ? `Etaj ${room.floor}` : "Fără etaj"}
-          </p>
+        <div className="flex items-start gap-2">
+          {onToggleSelect && (
+            <input
+              type="checkbox"
+              checked={selected}
+              onChange={() => onToggleSelect(room.id)}
+              className="mt-1 h-3.5 w-3.5 rounded border-slate-300 text-olive-600 focus:ring-olive-500"
+              aria-label={`Selectează camera ${room.number}`}
+            />
+          )}
+          <div>
+            <p className="text-lg font-bold text-slate-900">Camera {room.number}</p>
+            <p className="text-xs text-slate-500">
+              {room.type ? `${room.type} · ` : ""}
+              {room.floor !== null ? `Etaj ${room.floor}` : "Fără etaj"}
+            </p>
+          </div>
         </div>
         <RoomStatusBadge status={room.status} />
       </div>

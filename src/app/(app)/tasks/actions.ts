@@ -133,6 +133,49 @@ export async function deleteTask(taskId: string) {
   revalidatePath("/tasks");
 }
 
+// Bulk status change, restricted to todo/inprogress: forcing many tasks to
+// "done" at once would bypass the per-task checklist + photo-proof gate on
+// housekeeping tasks, so "Finalizat" stays a per-card action.
+export async function setTaskStatusBulk(taskIds: string[], status: Exclude<TaskStatus, "done">) {
+  if (taskIds.length === 0) return;
+  const supabase = await createClient();
+
+  const { data: tasks, error } = await supabase
+    .from("tasks")
+    .update({ status })
+    .in("id", taskIds)
+    .select("room_id, type");
+
+  if (error) {
+    throw new Error(error.message);
+  }
+
+  if (status === "inprogress") {
+    const roomIds = (tasks ?? [])
+      .filter((t) => t.type === "housekeeping" && t.room_id)
+      .map((t) => t.room_id as string);
+    if (roomIds.length > 0) {
+      await supabase.from("rooms").update({ status: "inprogress" }).in("id", roomIds);
+    }
+  }
+
+  revalidatePath("/tasks");
+  revalidatePath("/rooms");
+  revalidatePath("/");
+}
+
+export async function deleteTasksBulk(taskIds: string[]) {
+  if (taskIds.length === 0) return;
+  const supabase = await createClient();
+  const { error } = await supabase.from("tasks").delete().in("id", taskIds);
+
+  if (error) {
+    throw new Error(error.message);
+  }
+
+  revalidatePath("/tasks");
+}
+
 export async function toggleChecklistItem(taskId: string, index: number) {
   const supabase = await createClient();
 

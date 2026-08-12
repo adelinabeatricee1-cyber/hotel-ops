@@ -16,10 +16,14 @@ export function TaskCard({
   task,
   dueOut = false,
   turnover = false,
+  selected = false,
+  onToggleSelect,
 }: {
   task: TaskWithRelations;
   dueOut?: boolean;
   turnover?: boolean;
+  selected?: boolean;
+  onToggleSelect?: (taskId: string) => void;
 }) {
   const [isPending, startTransition] = useTransition();
   const [photoError, setPhotoError] = useState<string | null>(null);
@@ -82,12 +86,23 @@ export function TaskCard({
       )}
 
       <div className="flex items-start justify-between">
-        <div>
-          <p className="text-sm font-bold text-slate-900">Camera {task.room?.number ?? "—"}</p>
-          <p className="mt-0.5 inline-flex items-center gap-1 text-xs text-slate-500">
-            <TypeIcon className="h-3 w-3" />
-            {TASK_TYPE_LABELS[task.type]}
-          </p>
+        <div className="flex items-start gap-2">
+          {onToggleSelect && (
+            <input
+              type="checkbox"
+              checked={selected}
+              onChange={() => onToggleSelect(task.id)}
+              className="mt-1 h-3.5 w-3.5 rounded border-slate-300 text-olive-600 focus:ring-olive-500"
+              aria-label="Selectează task-ul"
+            />
+          )}
+          <div>
+            <p className="text-sm font-bold text-slate-900">Camera {task.room?.number ?? "—"}</p>
+            <p className="mt-0.5 inline-flex items-center gap-1 text-xs text-slate-500">
+              <TypeIcon className="h-3 w-3" />
+              {TASK_TYPE_LABELS[task.type]}
+            </p>
+          </div>
         </div>
         <span className="text-xs text-slate-400">
           {new Date(task.created_at).toLocaleDateString("ro-RO")}

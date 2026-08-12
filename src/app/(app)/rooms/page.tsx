@@ -3,7 +3,7 @@ import { DoorOpen } from "lucide-react";
 import { createClient } from "@/lib/supabase/server";
 import type { Room, RoomStatus } from "@/types/database";
 import { AddRoomForm } from "./add-room-form";
-import { RoomCard } from "./room-card";
+import { RoomsGrid } from "./rooms-grid";
 import { ROOM_STATUS_LABELS } from "./status-badge";
 
 const STATUS_FILTERS: RoomStatus[] = ["clean", "dirty", "inprogress", "blocked"];
@@ -47,17 +47,7 @@ export default async function RoomsPage({
         ))}
       </div>
 
-      {rooms && rooms.length > 0 ? (
-        <div className="mt-4 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
-          {rooms.map((room) => (
-            <RoomCard key={room.id} room={room} />
-          ))}
-        </div>
-      ) : (
-        <p className="mt-8 text-sm text-slate-500">
-          Nicio cameră găsită. Adaugă prima cameră mai sus.
-        </p>
-      )}
+      <RoomsGrid rooms={rooms ?? []} />
     </div>
   );
 }

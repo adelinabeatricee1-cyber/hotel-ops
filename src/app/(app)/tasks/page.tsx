@@ -4,13 +4,8 @@ import { todayDateString } from "@/lib/date-utils";
 import type { Room, Staff, TaskStatus, TaskWithRelations } from "@/types/database";
 import { ensureCheckoutHousekeepingTasks } from "./actions";
 import { CreateTaskForm } from "./create-task-form";
-import {
-  TASK_STATUS_COLUMN_STYLE,
-  TASK_STATUS_ICONS,
-  TASK_STATUS_LABELS,
-  TASK_STATUS_ORDER,
-} from "./labels";
-import { TaskCard } from "./task-card";
+import { TASK_STATUS_ORDER } from "./labels";
+import { TasksBoard } from "./tasks-board";
 
 export default async function TasksPage() {
   await ensureCheckoutHousekeepingTasks();
@@ -70,35 +65,7 @@ export default async function TasksPage() {
         <CreateTaskForm rooms={rooms ?? []} staff={staff ?? []} />
       </div>
 
-      <div className="mt-6 grid grid-cols-1 gap-4 md:grid-cols-3">
-        {TASK_STATUS_ORDER.map((status) => {
-          const Icon = TASK_STATUS_ICONS[status];
-          return (
-            <div key={status}>
-              <div
-                className={`inline-flex items-center gap-1.5 rounded-full px-3 py-1 text-sm font-semibold ${TASK_STATUS_COLUMN_STYLE[status]}`}
-              >
-                <Icon className="h-3.5 w-3.5" />
-                {TASK_STATUS_LABELS[status]}
-                <span className="opacity-70">({columns[status].length})</span>
-              </div>
-              <div className="mt-3 space-y-3">
-                {columns[status].map((task) => (
-                  <TaskCard
-                    key={task.id}
-                    task={task}
-                    dueOut={task.room_id ? dueOutRoomIds.has(task.room_id) : false}
-                    turnover={task.room_id ? turnoverRoomIds.has(task.room_id) : false}
-                  />
-                ))}
-                {columns[status].length === 0 && (
-                  <p className="text-sm text-slate-400">Niciun task</p>
-                )}
-              </div>
-            </div>
-          );
-        })}
-      </div>
+      <TasksBoard columns={columns} dueOutRoomIds={dueOutRoomIds} turnoverRoomIds={turnoverRoomIds} />
     </div>
   );
 }

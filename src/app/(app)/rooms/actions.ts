@@ -59,6 +59,19 @@ export async function setNightlyRate(roomId: string, rate: number | null) {
   revalidatePath("/rooms");
 }
 
+export async function setRoomStatusBulk(roomIds: string[], status: RoomStatus) {
+  if (roomIds.length === 0) return;
+  const supabase = await createClient();
+  const { error } = await supabase.from("rooms").update({ status }).in("id", roomIds);
+
+  if (error) {
+    throw new Error(error.message);
+  }
+
+  revalidatePath("/rooms");
+  revalidatePath("/");
+}
+
 export async function deleteRoom(roomId: string) {
   const supabase = await createClient();
   const { error } = await supabase.from("rooms").delete().eq("id", roomId);
