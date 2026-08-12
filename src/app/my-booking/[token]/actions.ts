@@ -46,6 +46,21 @@ export async function submitFeedback(
   return { error: undefined, success: true };
 }
 
+export async function cancelBooking(token: string): Promise<{ error?: string }> {
+  const supabase = await createClient();
+  const { error } = await supabase.rpc("cancel_booking_by_guest", { p_token: token });
+
+  if (error) {
+    return {
+      error: error.message.includes("too close")
+        ? "Nu mai poți anula online — check-in-ul este prea aproape. Contactează recepția."
+        : "Nu am putut anula rezervarea. Contactează recepția.",
+    };
+  }
+
+  return {};
+}
+
 export async function requestParking(token: string): Promise<{ label: string | null }> {
   const supabase = await createClient();
   const { data, error } = await supabase.rpc("request_guest_parking", { p_token: token });

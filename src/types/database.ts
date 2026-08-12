@@ -18,6 +18,8 @@ export interface Hotel {
   cover_image_url: string | null;
   booking_slug: string | null;
   google_review_url: string | null;
+  cancellation_policy: string | null;
+  free_cancellation_hours: number;
   created_at: string;
 }
 
@@ -92,6 +94,8 @@ export interface Booking {
   external_booking_id: string | null;
   guest_access_token: string;
   group_id: string | null;
+  cancelled_at: string | null;
+  cancelled_by_guest: boolean;
   created_at: string;
 }
 

@@ -1176,3 +1176,95 @@ end;
 $$;
 
 grant execute on function switch_property(uuid) to authenticated;
+
+-- ---------------------------------------------------------------------------
+-- Guest-initiated cancellation: the hotel sets a policy (free text +
+-- a "free until N hours before check-in" window shown to the guest); the
+-- guest can cancel their own not-yet-arrived booking straight from the
+-- guest portal, no staff action required.
+-- ---------------------------------------------------------------------------
+
+alter table hotels add column if not exists cancellation_policy text;
+alter table hotels add column if not exists free_cancellation_hours int not null default 48;
+
+alter table bookings add column if not exists cancelled_at timestamptz;
+alter table bookings add column if not exists cancelled_by_guest boolean not null default false;
+
+drop function if exists get_booking_by_token(uuid);
+
+create or replace function get_booking_by_token(p_token uuid)
+returns table (
+  guest_name text,
+  checkin date,
+  checkout date,
+  room_number text,
+  price numeric,
+  amount_paid numeric,
+  payment_status text,
+  invoice_number int,
+  hotel_name text,
+  wifi_network text,
+  wifi_password text,
+  reception_phone text,
+  parking_label text,
+  cover_image_url text,
+  status text,
+  cancellation_policy text,
+  free_cancellation_hours int
+)
+language plpgsql
+security definer
+set search_path = public
+as $$
+begin
+  return query
+    select b.guest_name, b.checkin, b.checkout, r.number, b.price, b.amount_paid,
+           b.payment_status, b.invoice_number, h.name,
+           h.wifi_network, h.wifi_password, h.reception_phone,
+           (select p.label from parking_spots p
+              where p.hotel_id = b.hotel_id and p.guest_name = b.guest_name
+                and p.status = 'occupied'
+              limit 1),
+           h.cover_image_url,
+           b.status,
+           h.cancellation_policy,
+           h.free_cancellation_hours
+    from bookings b
+    left join rooms r on r.id = b.room_id
+    join hotels h on h.id = b.hotel_id
+    where b.guest_access_token = p_token;
+end;
+$$;
+
+grant execute on function get_booking_by_token(uuid) to anon, authenticated;
+
+create or replace function cancel_booking_by_guest(p_token uuid)
+returns void
+language plpgsql
+security definer
+set search_path = public
+as $$
+declare
+  v_booking bookings%rowtype;
+begin
+  select * into v_booking from bookings where guest_access_token = p_token;
+
+  if v_booking.id is null then
+    raise exception 'invalid token';
+  end if;
+
+  if v_booking.status in ('cancelled', 'checked_in', 'checked_out') then
+    raise exception 'booking cannot be cancelled online anymore';
+  end if;
+
+  if v_booking.checkin <= current_date then
+    raise exception 'too close to check-in to cancel online';
+  end if;
+
+  update bookings
+    set status = 'cancelled', cancelled_at = now(), cancelled_by_guest = true
+    where id = v_booking.id;
+end;
+$$;
+
+grant execute on function cancel_booking_by_guest(uuid) to anon, authenticated;

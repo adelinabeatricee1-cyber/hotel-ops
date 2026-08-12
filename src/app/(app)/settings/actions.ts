@@ -16,6 +16,8 @@ export async function updateGuestSettings(
   const receptionPhone = String(formData.get("reception_phone") ?? "").trim();
   const coverImageUrl = String(formData.get("cover_image_url") ?? "").trim();
   const googleReviewUrl = String(formData.get("google_review_url") ?? "").trim();
+  const cancellationPolicy = String(formData.get("cancellation_policy") ?? "").trim();
+  const freeCancellationHoursRaw = String(formData.get("free_cancellation_hours") ?? "").trim();
   const bookingSlugRaw = String(formData.get("booking_slug") ?? "").trim();
 
   const bookingSlug = bookingSlugRaw
@@ -39,6 +41,8 @@ export async function updateGuestSettings(
       reception_phone: receptionPhone || null,
       cover_image_url: coverImageUrl || null,
       google_review_url: googleReviewUrl || null,
+      cancellation_policy: cancellationPolicy || null,
+      free_cancellation_hours: freeCancellationHoursRaw ? Number(freeCancellationHoursRaw) : 48,
       booking_slug: bookingSlug || null,
     })
     .eq("id", profile.hotel_id);

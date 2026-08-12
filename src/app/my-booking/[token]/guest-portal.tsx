@@ -11,10 +11,11 @@ import {
   Check,
   Copy,
   CalendarClock,
+  XCircle,
 } from "lucide-react";
-import { requestHousekeeping, requestParking, submitFeedback } from "./actions";
+import { cancelBooking, requestHousekeeping, requestParking, submitFeedback } from "./actions";
 import { PAYMENT_STATUS_LABELS, PAYMENT_STATUS_STYLES } from "@/app/(app)/bookings/labels";
-import type { PaymentStatus } from "@/types/database";
+import type { BookingStatus, PaymentStatus } from "@/types/database";
 
 function ActionCard({
   icon,
@@ -282,6 +283,99 @@ function ReceptionCard({ phone, guestName }: { phone: string; guestName: string 
   );
 }
 
+function CancellationCard({
+  token,
+  status,
+  checkin,
+  cancellationPolicy,
+  freeCancellationHours,
+}: {
+  token: string;
+  status: BookingStatus;
+  checkin: string;
+  cancellationPolicy: string | null;
+  freeCancellationHours: number;
+}) {
+  const [isPending, startTransition] = useTransition();
+  const [confirming, setConfirming] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const [cancelled, setCancelled] = useState(status === "cancelled");
+  const [now] = useState(() => Date.now());
+
+  const checkinDate = new Date(`${checkin}T00:00:00`);
+  const canCancelOnline = !cancelled && status === "confirmed" && checkinDate.getTime() > now;
+  const hoursUntilCheckin = (checkinDate.getTime() - now) / (1000 * 60 * 60);
+  const isFree = hoursUntilCheckin >= freeCancellationHours;
+
+  function handleCancel() {
+    setError(null);
+    startTransition(async () => {
+      const result = await cancelBooking(token);
+      if (result.error) {
+        setError(result.error);
+        return;
+      }
+      setCancelled(true);
+      setConfirming(false);
+    });
+  }
+
+  if (cancelled) {
+    return (
+      <ActionCard icon={<XCircle className="h-5 w-5" />} title="Anulare" subtitle="Rezervare anulată">
+        <p className="text-sm text-stone-500">
+          Această rezervare a fost anulată. Ne pare rău că nu ne vom vedea de data aceasta!
+        </p>
+      </ActionCard>
+    );
+  }
+
+  if (!canCancelOnline) {
+    return null;
+  }
+
+  return (
+    <ActionCard icon={<XCircle className="h-5 w-5" />} title="Anulare" subtitle="Gestionează rezervarea">
+      {cancellationPolicy && <p className="text-xs text-stone-500">{cancellationPolicy}</p>}
+      <p className="mt-1 text-xs text-stone-400">
+        {isFree ? "Anulare gratuită acum." : "În afara ferestrei de anulare gratuită."}
+      </p>
+      {confirming ? (
+        <div className="mt-2 space-y-2">
+          <p className="text-sm font-medium text-stone-700">Sigur anulezi rezervarea?</p>
+          <div className="flex gap-2">
+            <button
+              type="button"
+              onClick={handleCancel}
+              disabled={isPending}
+              className="flex-1 rounded-lg bg-red-600 px-3 py-2 text-sm font-semibold text-white transition hover:bg-red-700 disabled:opacity-60"
+            >
+              {isPending ? "Se anulează..." : "Da, anulează"}
+            </button>
+            <button
+              type="button"
+              onClick={() => setConfirming(false)}
+              disabled={isPending}
+              className="flex-1 rounded-lg border border-stone-200 px-3 py-2 text-sm font-medium text-stone-600 hover:bg-stone-50"
+            >
+              Renunță
+            </button>
+          </div>
+        </div>
+      ) : (
+        <button
+          type="button"
+          onClick={() => setConfirming(true)}
+          className="mt-2 w-full rounded-lg border border-red-200 px-3 py-2 text-sm font-semibold text-red-600 transition hover:bg-red-50"
+        >
+          Anulează rezervarea
+        </button>
+      )}
+      {error && <p className="mt-2 text-xs text-red-600">{error}</p>}
+    </ActionCard>
+  );
+}
+
 function StayCard({
   roomNumber,
   checkin,
@@ -356,6 +450,9 @@ export function GuestPortal({
   receptionPhone,
   parkingLabel,
   coverImageUrl,
+  status,
+  cancellationPolicy,
+  freeCancellationHours,
 }: {
   token: string;
   guestName: string;
@@ -372,6 +469,9 @@ export function GuestPortal({
   receptionPhone: string | null;
   parkingLabel: string | null;
   coverImageUrl: string | null;
+  status: BookingStatus;
+  cancellationPolicy: string | null;
+  freeCancellationHours: number;
 }) {
   return (
     <div className="mx-auto max-w-2xl">
@@ -411,6 +511,13 @@ export function GuestPortal({
         )}
         {receptionPhone && <ReceptionCard phone={receptionPhone} guestName={guestName} />}
         <FeedbackCard token={token} />
+        <CancellationCard
+          token={token}
+          status={status}
+          checkin={checkin}
+          cancellationPolicy={cancellationPolicy}
+          freeCancellationHours={freeCancellationHours}
+        />
         <StayCard
           roomNumber={roomNumber}
           checkin={checkin}

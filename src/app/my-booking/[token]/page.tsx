@@ -1,6 +1,6 @@
 import { BedDouble } from "lucide-react";
 import { createClient } from "@/lib/supabase/server";
-import type { PaymentStatus } from "@/types/database";
+import type { BookingStatus, PaymentStatus } from "@/types/database";
 import { GuestPortal } from "./guest-portal";
 import { PrintButton } from "./print-button";
 
@@ -19,6 +19,9 @@ interface BookingLookup {
   reception_phone: string | null;
   parking_label: string | null;
   cover_image_url: string | null;
+  status: BookingStatus;
+  cancellation_policy: string | null;
+  free_cancellation_hours: number;
 }
 
 export default async function MyBookingPage({
@@ -68,6 +71,9 @@ export default async function MyBookingPage({
         receptionPhone={booking.reception_phone}
         parkingLabel={booking.parking_label}
         coverImageUrl={booking.cover_image_url}
+        status={booking.status}
+        cancellationPolicy={booking.cancellation_policy}
+        freeCancellationHours={booking.free_cancellation_hours}
       />
     </div>
   );

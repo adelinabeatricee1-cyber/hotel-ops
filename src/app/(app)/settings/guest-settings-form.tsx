@@ -123,6 +123,36 @@ export function GuestSettingsForm({ hotel }: { hotel: Hotel }) {
           Folosit pentru butonul „Cere recenzie&rdquo; care apare la Rezervări după check-out.
         </p>
       </div>
+      <div>
+        <label htmlFor="cancellation_policy" className="block text-xs font-medium text-slate-600">
+          Politică de anulare
+        </label>
+        <textarea
+          id="cancellation_policy"
+          name="cancellation_policy"
+          rows={2}
+          placeholder="Anulare gratuită până la 48h înainte de check-in."
+          defaultValue={hotel.cancellation_policy ?? ""}
+          className="mt-1 w-full max-w-md rounded-lg border border-slate-300 px-2 py-1.5 text-sm shadow-sm focus:border-olive-500 focus:outline-none focus:ring-2 focus:ring-olive-500/20"
+        />
+      </div>
+      <div>
+        <label htmlFor="free_cancellation_hours" className="block text-xs font-medium text-slate-600">
+          Ore până la check-in pentru anulare gratuită
+        </label>
+        <input
+          id="free_cancellation_hours"
+          name="free_cancellation_hours"
+          type="number"
+          min="0"
+          defaultValue={hotel.free_cancellation_hours}
+          className="mt-1 w-24 rounded-lg border border-slate-300 px-2 py-1.5 text-sm shadow-sm focus:border-olive-500 focus:outline-none focus:ring-2 focus:ring-olive-500/20"
+        />
+        <p className="mt-1 text-xs text-slate-400">
+          Oaspeții pot anula singuri rezervarea din pagina lor, oricând înainte de check-in; acest
+          prag afectează doar mesajul afișat (gratuit / posibile taxe).
+        </p>
+      </div>
 
       {state?.error && <p className="text-sm text-red-600">{state.error}</p>}
       {state?.success && <p className="text-sm text-emerald-600">Salvat.</p>}
