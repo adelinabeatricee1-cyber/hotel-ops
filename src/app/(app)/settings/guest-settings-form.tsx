@@ -4,6 +4,7 @@ import { useActionState, useState } from "react";
 import { Copy, Check } from "lucide-react";
 import type { Hotel } from "@/types/database";
 import { updateGuestSettings } from "./actions";
+import { CoverImageUploader } from "./cover-image-uploader";
 
 export function GuestSettingsForm({ hotel }: { hotel: Hotel }) {
   const [state, formAction, pending] = useActionState(updateGuestSettings, undefined);
@@ -91,22 +92,7 @@ export function GuestSettingsForm({ hotel }: { hotel: Hotel }) {
           Fără +, spații sau zero inițial — ex. pentru 07xx xxx xxx scrie 407xxxxxxxx.
         </p>
       </div>
-      <div>
-        <label htmlFor="cover_image_url" className="block text-xs font-medium text-slate-600">
-          Poză de fundal (pagina oaspetelui)
-        </label>
-        <input
-          id="cover_image_url"
-          name="cover_image_url"
-          type="url"
-          placeholder="https://..."
-          defaultValue={hotel.cover_image_url ?? ""}
-          className="mt-1 w-full max-w-xs rounded-lg border border-slate-300 px-2 py-1.5 text-sm shadow-sm focus:border-olive-500 focus:outline-none focus:ring-2 focus:ring-olive-500/20"
-        />
-        <p className="mt-1 text-xs text-slate-400">
-          Link către o poză a hotelului (ex. din Google Photos, Imgur). Opțional.
-        </p>
-      </div>
+      <CoverImageUploader coverImageUrl={hotel.cover_image_url} />
       <div>
         <label htmlFor="google_review_url" className="block text-xs font-medium text-slate-600">
           Link recenzie Google

@@ -1268,3 +1268,27 @@ end;
 $$;
 
 grant execute on function cancel_booking_by_guest(uuid) to anon, authenticated;
+
+-- ---------------------------------------------------------------------------
+-- Hotel cover photo upload: lets admin/manager upload an image file directly
+-- (instead of only pasting a URL) for the dashboard hero and guest portal
+-- background. Same public-bucket pattern as task-photos.
+-- ---------------------------------------------------------------------------
+
+insert into storage.buckets (id, name, public)
+values ('hotel-covers', 'hotel-covers', true)
+on conflict (id) do nothing;
+
+drop policy if exists "hotel-covers: authenticated insert" on storage.objects;
+create policy "hotel-covers: authenticated insert" on storage.objects
+  for insert to authenticated
+  with check (bucket_id = 'hotel-covers');
+
+drop policy if exists "hotel-covers: authenticated delete own" on storage.objects;
+create policy "hotel-covers: authenticated delete own" on storage.objects
+  for delete to authenticated
+  using (bucket_id = 'hotel-covers');
+
+drop policy if exists "hotel-covers: public read" on storage.objects;
+create policy "hotel-covers: public read" on storage.objects
+  for select using (bucket_id = 'hotel-covers');
