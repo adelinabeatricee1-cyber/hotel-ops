@@ -16,6 +16,7 @@ export interface Hotel {
   reception_phone: string | null;
   cover_image_url: string | null;
   booking_slug: string | null;
+  google_review_url: string | null;
   created_at: string;
 }
 

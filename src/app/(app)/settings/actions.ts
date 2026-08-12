@@ -15,6 +15,7 @@ export async function updateGuestSettings(
   const wifiPassword = String(formData.get("wifi_password") ?? "").trim();
   const receptionPhone = String(formData.get("reception_phone") ?? "").trim();
   const coverImageUrl = String(formData.get("cover_image_url") ?? "").trim();
+  const googleReviewUrl = String(formData.get("google_review_url") ?? "").trim();
   const bookingSlugRaw = String(formData.get("booking_slug") ?? "").trim();
 
   const bookingSlug = bookingSlugRaw
@@ -37,6 +38,7 @@ export async function updateGuestSettings(
       wifi_password: wifiPassword || null,
       reception_phone: receptionPhone || null,
       cover_image_url: coverImageUrl || null,
+      google_review_url: googleReviewUrl || null,
       booking_slug: bookingSlug || null,
     })
     .eq("id", profile.hotel_id);

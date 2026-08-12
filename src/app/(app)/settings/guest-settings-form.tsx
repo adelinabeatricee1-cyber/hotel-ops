@@ -107,6 +107,22 @@ export function GuestSettingsForm({ hotel }: { hotel: Hotel }) {
           Link către o poză a hotelului (ex. din Google Photos, Imgur). Opțional.
         </p>
       </div>
+      <div>
+        <label htmlFor="google_review_url" className="block text-xs font-medium text-slate-600">
+          Link recenzie Google
+        </label>
+        <input
+          id="google_review_url"
+          name="google_review_url"
+          type="url"
+          placeholder="https://g.page/r/.../review"
+          defaultValue={hotel.google_review_url ?? ""}
+          className="mt-1 w-full max-w-xs rounded-lg border border-slate-300 px-2 py-1.5 text-sm shadow-sm focus:border-olive-500 focus:outline-none focus:ring-2 focus:ring-olive-500/20"
+        />
+        <p className="mt-1 text-xs text-slate-400">
+          Folosit pentru butonul „Cere recenzie&rdquo; care apare la Rezervări după check-out.
+        </p>
+      </div>
 
       {state?.error && <p className="text-sm text-red-600">{state.error}</p>}
       {state?.success && <p className="text-sm text-emerald-600">Salvat.</p>}

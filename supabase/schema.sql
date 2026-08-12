@@ -918,3 +918,10 @@ end;
 $$;
 
 grant execute on function submit_guest_feedback(uuid, text) to anon, authenticated;
+
+-- ---------------------------------------------------------------------------
+-- Post-checkout review requests: a Google review link staff can send guests
+-- shortly after they leave, from a "Cere recenzie" button on Rezervări.
+-- ---------------------------------------------------------------------------
+
+alter table hotels add column if not exists google_review_url text;

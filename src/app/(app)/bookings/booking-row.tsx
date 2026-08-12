@@ -2,7 +2,7 @@
 
 import { useState, useTransition } from "react";
 import Link from "next/link";
-import { Trash2, Receipt, ExternalLink, Link2, Check, MessageCircle } from "lucide-react";
+import { Trash2, Receipt, ExternalLink, Link2, Check, MessageCircle, Star } from "lucide-react";
 import type { BookingWithRoom, Hotel, PaymentStatus } from "@/types/database";
 import { todayDateString } from "@/lib/date-utils";
 import { deleteBooking, setPaymentStatus } from "./actions";
@@ -27,6 +27,12 @@ function normalizePhone(phone: string) {
   return digits;
 }
 
+function daysSince(dateStr: string, todayStr: string) {
+  const then = new Date(`${dateStr}T00:00:00Z`).getTime();
+  const now = new Date(`${todayStr}T00:00:00Z`).getTime();
+  return Math.round((now - then) / (1000 * 60 * 60 * 24));
+}
+
 export function BookingRow({ booking, hotel }: { booking: BookingWithRoom; hotel: Hotel }) {
   const [isPending, startTransition] = useTransition();
   const [amountPaid, setAmountPaid] = useState(String(booking.amount_paid ?? 0));
@@ -38,6 +44,8 @@ export function BookingRow({ booking, hotel }: { booking: BookingWithRoom; hotel
   const isCheckinSoon =
     (booking.status === "confirmed" || booking.status === "checked_in") &&
     (booking.checkin === today || booking.checkin === tomorrow);
+  const sinceCheckout = daysSince(booking.checkout, today);
+  const isRecentCheckout = booking.status !== "cancelled" && sinceCheckout >= 0 && sinceCheckout <= 3;
 
   function handleCopyGuestLink() {
     const link = `${window.location.origin}/my-booking/${booking.guest_access_token}`;
@@ -58,6 +66,21 @@ export function BookingRow({ booking, hotel }: { booking: BookingWithRoom; hotel
     }
     lines.push(`Detaliile rezervării dvs.: ${link}`);
     lines.push("Vă mulțumim și vă așteptăm cu drag!");
+
+    const waLink = `https://wa.me/${normalizePhone(booking.phone)}?text=${encodeURIComponent(lines.join("\n"))}`;
+    window.open(waLink, "_blank", "noopener,noreferrer");
+  }
+
+  function handleRequestReview() {
+    if (!booking.phone) return;
+    const lines = [
+      `Bună, ${booking.guest_name}! Vă mulțumim că ați stat la ${hotel.name}.`,
+      "Ne-ar ajuta enorm o părere sinceră despre sejurul dvs.",
+    ];
+    if (hotel.google_review_url) {
+      lines.push(`Lăsați-ne o recenzie aici: ${hotel.google_review_url}`);
+    }
+    lines.push("Vă mulțumim și vă așteptăm cu drag data viitoare!");
 
     const waLink = `https://wa.me/${normalizePhone(booking.phone)}?text=${encodeURIComponent(lines.join("\n"))}`;
     window.open(waLink, "_blank", "noopener,noreferrer");
@@ -168,6 +191,17 @@ export function BookingRow({ booking, hotel }: { booking: BookingWithRoom; hotel
             >
               <MessageCircle className="h-3.5 w-3.5" />
               Bun venit
+            </button>
+          )}
+          {isRecentCheckout && booking.phone && (
+            <button
+              type="button"
+              onClick={handleRequestReview}
+              className="inline-flex items-center gap-1 text-xs font-medium text-amber-600 hover:text-amber-700"
+              title="Cere o recenzie pe WhatsApp"
+            >
+              <Star className="h-3.5 w-3.5" />
+              Cere recenzie
             </button>
           )}
           <button
