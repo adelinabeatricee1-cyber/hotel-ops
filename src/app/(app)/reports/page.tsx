@@ -2,10 +2,11 @@ import Link from "next/link";
 import { BarChart3, ChevronLeft, ChevronRight, Percent, Wallet, TrendingUp } from "lucide-react";
 import { createClient } from "@/lib/supabase/server";
 import { requireAdmin } from "@/lib/current-user";
-import { resolveMonth } from "@/lib/date-utils";
+import { lastMonths, resolveMonth } from "@/lib/date-utils";
 import type { BookingSource } from "@/types/database";
 import { SOURCE_LABELS } from "../bookings/labels";
 import { TargetCard } from "./target-card";
+import { TrendChart } from "./trend-chart";
 
 interface BookingSlim {
   checkin: string;
@@ -72,6 +73,42 @@ export default async function ReportsPage({
   const capacity = (totalRooms ?? 0) * range.days.length;
   const occupancyRate = capacity > 0 ? (totalNights / capacity) * 100 : 0;
 
+  const trendMonths = lastMonths(range.year, range.month, 6);
+  const { data: trendBookings } = await supabase
+    .from("bookings")
+    .select("checkin, checkout, price")
+    .neq("status", "cancelled")
+    .gte("checkin", trendMonths[0].startDate)
+    .lte("checkin", trendMonths[trendMonths.length - 1].endDate)
+    .returns<Pick<BookingSlim, "checkin" | "checkout" | "price">[]>();
+
+  const trendBuckets = trendMonths.map((m) => ({ ...m, nights: 0, revenue: 0 }));
+  for (const booking of trendBookings ?? []) {
+    const y = Number(booking.checkin.slice(0, 4));
+    const m = Number(booking.checkin.slice(5, 7)) - 1;
+    const bucket = trendBuckets.find((b) => b.year === y && b.month === m);
+    if (!bucket) continue;
+
+    const bucketEndExclusive = new Date(`${bucket.endDate}T00:00:00Z`);
+    bucketEndExclusive.setUTCDate(bucketEndExclusive.getUTCDate() + 1);
+    const checkin = new Date(`${booking.checkin}T00:00:00Z`);
+    const checkoutRaw = new Date(`${booking.checkout}T00:00:00Z`);
+    const checkout = checkoutRaw < bucketEndExclusive ? checkoutRaw : bucketEndExclusive;
+    const nights = Math.max(
+      Math.round((checkout.getTime() - checkin.getTime()) / (1000 * 60 * 60 * 24)),
+      0,
+    );
+
+    bucket.nights += nights;
+    bucket.revenue += booking.price ?? 0;
+  }
+
+  const trendPoints = trendBuckets.map((b) => ({
+    label: b.label,
+    adr: b.nights > 0 ? b.revenue / b.nights : 0,
+    revpar: (totalRooms ?? 0) > 0 ? b.revenue / ((totalRooms ?? 0) * b.daysInMonth) : 0,
+  }));
+
   return (
     <div>
       <div className="flex items-center gap-2.5">
@@ -131,6 +168,11 @@ export default async function ReportsPage({
       </div>
 
       <TargetCard target={hotel.monthly_revenue_target} revenue={totalRevenue} />
+
+      <div className="mt-6 rounded-xl border border-slate-100 bg-white p-4 shadow-sm">
+        <h2 className="text-sm font-semibold text-slate-700">Tendință ADR / RevPAR (ultimele 6 luni)</h2>
+        <TrendChart points={trendPoints} />
+      </div>
 
       <div className="mt-6 rounded-xl border border-slate-100 bg-white p-4 shadow-sm">
         <h2 className="text-sm font-semibold text-slate-700">Rezervări pe sursă</h2>

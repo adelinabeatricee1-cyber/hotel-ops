@@ -63,6 +63,35 @@ export function resolveMonth(monthParam: string | undefined): MonthRange {
   };
 }
 
+export interface TrendMonth {
+  year: number;
+  month: number; // 0-indexed
+  label: string; // short, e.g. "Ian 2026"
+  startDate: string;
+  endDate: string;
+  daysInMonth: number;
+}
+
+// Returns `count` months ending with (and including) `year`/`month`, oldest first.
+export function lastMonths(year: number, month: number, count: number): TrendMonth[] {
+  const result: TrendMonth[] = [];
+  for (let i = count - 1; i >= 0; i--) {
+    const d = new Date(Date.UTC(year, month - i, 1));
+    const y = d.getUTCFullYear();
+    const m = d.getUTCMonth();
+    const daysInMonth = new Date(Date.UTC(y, m + 1, 0)).getUTCDate();
+    result.push({
+      year: y,
+      month: m,
+      label: `${MONTH_LABELS[m].slice(0, 3)} ${y}`,
+      startDate: toDateString(y, m, 1),
+      endDate: toDateString(y, m, daysInMonth),
+      daysInMonth,
+    });
+  }
+  return result;
+}
+
 export function dayOfMonthLabel(dateStr: string) {
   return Number(dateStr.slice(-2));
 }
