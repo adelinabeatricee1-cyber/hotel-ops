@@ -140,24 +140,20 @@ export default async function DashboardPage() {
   const monthRevenue = (monthBookings ?? []).reduce((sum, b) => sum + (b.price ?? 0), 0);
 
   return (
-    <div>
+    <div className="relative -m-6 md:-m-8">
       <div
-        className="relative overflow-hidden rounded-2xl p-6 text-white shadow-lg shadow-olive-600/20 sm:p-8"
+        className="absolute inset-x-0 top-0 h-[440px] bg-cover bg-center sm:h-[520px]"
         style={
           hotel.cover_image_url
-            ? {
-                backgroundImage: `url(${hotel.cover_image_url})`,
-                backgroundSize: "cover",
-                backgroundPosition: "center",
-              }
+            ? { backgroundImage: `url(${hotel.cover_image_url})` }
             : undefined
         }
       >
         <div
           className={
             hotel.cover_image_url
-              ? "absolute inset-0 bg-gradient-to-br from-olive-900/85 via-olive-800/80 to-olive-700/75"
-              : "absolute inset-0 bg-gradient-to-br from-olive-600 to-olive-800"
+              ? "absolute inset-0 bg-gradient-to-b from-olive-950/80 via-olive-900/55 to-slate-50"
+              : "absolute inset-0 bg-gradient-to-b from-olive-700 via-olive-700/80 to-slate-50"
           }
         />
         {!hotel.cover_image_url && (
@@ -195,10 +191,13 @@ export default async function DashboardPage() {
             </g>
           </svg>
         )}
-        <div className="relative flex flex-wrap items-end justify-between gap-4">
+      </div>
+
+      <div className="relative p-6 md:p-8">
+        <div className="flex flex-wrap items-end justify-between gap-4 text-white">
           <div>
             <p className="text-sm capitalize text-white/70">{formatToday()}</p>
-            <h1 className="mt-1 text-2xl font-bold sm:text-3xl">
+            <h1 className="mt-1 text-2xl font-bold drop-shadow-sm sm:text-3xl">
               {t.dashboard.welcome}, {hotel.name}
             </h1>
             <p className="mt-1 text-sm text-white/80">{t.dashboard.summary}</p>
@@ -211,43 +210,42 @@ export default async function DashboardPage() {
             </div>
           </div>
         </div>
-      </div>
 
-      <section className="mt-8">
-        <h2 className="text-sm font-semibold text-slate-700">Astăzi</h2>
-        <div className="mt-3 grid grid-cols-2 gap-4 sm:grid-cols-4">
-          <div className="rounded-xl border border-emerald-100 bg-white p-4 shadow-sm">
-            <div className="inline-flex h-9 w-9 items-center justify-center rounded-lg bg-emerald-100 text-emerald-600">
-              <LogIn className="h-4.5 w-4.5" />
+        <section className="mt-8">
+          <h2 className="text-sm font-semibold text-white drop-shadow-sm">Astăzi</h2>
+          <div className="mt-3 grid grid-cols-2 gap-4 sm:grid-cols-4">
+            <div className="rounded-xl border border-emerald-100 bg-white p-4 shadow-md">
+              <div className="inline-flex h-9 w-9 items-center justify-center rounded-lg bg-emerald-100 text-emerald-600">
+                <LogIn className="h-4.5 w-4.5" />
+              </div>
+              <p className="mt-3 text-2xl font-bold text-slate-900">{arrivalsN ?? 0}</p>
+              <p className="text-xs text-slate-500">Check-in-uri azi</p>
             </div>
-            <p className="mt-3 text-2xl font-bold text-slate-900">{arrivalsN ?? 0}</p>
-            <p className="text-xs text-slate-500">Check-in-uri azi</p>
-          </div>
-          <div className="rounded-xl border border-amber-100 bg-white p-4 shadow-sm">
-            <div className="inline-flex h-9 w-9 items-center justify-center rounded-lg bg-amber-100 text-amber-600">
-              <LogOut className="h-4.5 w-4.5" />
+            <div className="rounded-xl border border-amber-100 bg-white p-4 shadow-md">
+              <div className="inline-flex h-9 w-9 items-center justify-center rounded-lg bg-amber-100 text-amber-600">
+                <LogOut className="h-4.5 w-4.5" />
+              </div>
+              <p className="mt-3 text-2xl font-bold text-slate-900">{departuresN ?? 0}</p>
+              <p className="text-xs text-slate-500">Check-out-uri azi</p>
             </div>
-            <p className="mt-3 text-2xl font-bold text-slate-900">{departuresN ?? 0}</p>
-            <p className="text-xs text-slate-500">Check-out-uri azi</p>
-          </div>
-          <div className="rounded-xl border border-sky-100 bg-white p-4 shadow-sm">
-            <div className="inline-flex h-9 w-9 items-center justify-center rounded-lg bg-sky-100 text-sky-600">
-              <SquareParking className="h-4.5 w-4.5" />
+            <div className="rounded-xl border border-sky-100 bg-white p-4 shadow-md">
+              <div className="inline-flex h-9 w-9 items-center justify-center rounded-lg bg-sky-100 text-sky-600">
+                <SquareParking className="h-4.5 w-4.5" />
+              </div>
+              <p className="mt-3 text-2xl font-bold text-slate-900">
+                {occupiedParking}/{totalParking}
+              </p>
+              <p className="text-xs text-slate-500">Locuri de parcare ocupate</p>
             </div>
-            <p className="mt-3 text-2xl font-bold text-slate-900">
-              {occupiedParking}/{totalParking}
-            </p>
-            <p className="text-xs text-slate-500">Locuri de parcare ocupate</p>
-          </div>
-          <div className="rounded-xl border border-violet-100 bg-white p-4 shadow-sm">
-            <div className="inline-flex h-9 w-9 items-center justify-center rounded-lg bg-violet-100 text-violet-600">
-              <CalendarClock className="h-4.5 w-4.5" />
+            <div className="rounded-xl border border-violet-100 bg-white p-4 shadow-md">
+              <div className="inline-flex h-9 w-9 items-center justify-center rounded-lg bg-violet-100 text-violet-600">
+                <CalendarClock className="h-4.5 w-4.5" />
+              </div>
+              <p className="mt-3 text-2xl font-bold text-slate-900">{shiftsN ?? 0}</p>
+              <p className="text-xs text-slate-500">Persoane în tură azi</p>
             </div>
-            <p className="mt-3 text-2xl font-bold text-slate-900">{shiftsN ?? 0}</p>
-            <p className="text-xs text-slate-500">Persoane în tură azi</p>
           </div>
-        </div>
-      </section>
+        </section>
 
       <section className="mt-8">
         <h2 className="text-sm font-semibold text-slate-700">
@@ -378,6 +376,7 @@ export default async function DashboardPage() {
           </p>
         </div>
       )}
+      </div>
     </div>
   );
 }
