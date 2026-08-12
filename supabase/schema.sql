@@ -1017,3 +1017,162 @@ create policy "shifts: admin/manager delete" on shifts
 
 alter table bookings add column if not exists group_id uuid;
 create index if not exists bookings_group_id_idx on bookings (group_id);
+
+-- ---------------------------------------------------------------------------
+-- Multi-property support: a profile can belong to more than one hotel.
+-- `profiles.hotel_id`/`profiles.role` stay the single source of truth that
+-- every existing RLS policy already keys off (via auth_hotel_id()/auth_role())
+-- — switching "active property" just updates those two columns on the
+-- profile, so no other policy needs to change. profile_hotels only tracks
+-- which properties a profile may switch into.
+-- ---------------------------------------------------------------------------
+
+create table if not exists profile_hotels (
+  id uuid primary key default gen_random_uuid(),
+  profile_id uuid not null references profiles (id) on delete cascade,
+  hotel_id uuid not null references hotels (id) on delete cascade,
+  role text not null default 'admin' check (role in ('admin', 'manager', 'staff')),
+  created_at timestamptz not null default now(),
+  unique (profile_id, hotel_id)
+);
+
+create index if not exists profile_hotels_profile_id_idx on profile_hotels (profile_id);
+
+alter table profile_hotels enable row level security;
+
+drop policy if exists "profile_hotels: select own" on profile_hotels;
+create policy "profile_hotels: select own" on profile_hotels
+  for select using (profile_id = auth.uid());
+
+-- Backfill: every existing profile at least has access to its current hotel.
+insert into profile_hotels (profile_id, hotel_id, role)
+select id, hotel_id, role from profiles
+on conflict (profile_id, hotel_id) do nothing;
+
+create or replace function create_hotel_and_profile(hotel_name text, owner_full_name text)
+returns uuid
+language plpgsql
+security definer
+set search_path = public
+as $$
+declare
+  new_hotel_id uuid;
+begin
+  if exists (select 1 from profiles where id = auth.uid()) then
+    raise exception 'profile already exists for this user';
+  end if;
+
+  insert into hotels (name) values (hotel_name) returning id into new_hotel_id;
+
+  insert into profiles (id, hotel_id, full_name, role)
+  values (auth.uid(), new_hotel_id, owner_full_name, 'admin');
+
+  insert into profile_hotels (profile_id, hotel_id, role)
+  values (auth.uid(), new_hotel_id, 'admin');
+
+  return new_hotel_id;
+end;
+$$;
+
+create or replace function redeem_invite(p_token uuid, p_full_name text)
+returns uuid
+language plpgsql
+security definer
+set search_path = public
+as $$
+declare
+  v_invite invites%rowtype;
+  v_user_id uuid := auth.uid();
+begin
+  if v_user_id is null then
+    raise exception 'must be authenticated';
+  end if;
+
+  if exists (select 1 from profiles where id = v_user_id) then
+    raise exception 'profile already exists for this user';
+  end if;
+
+  select * into v_invite from invites where token = p_token for update;
+
+  if v_invite.id is null then
+    raise exception 'invalid invite';
+  end if;
+
+  if v_invite.used_at is not null then
+    raise exception 'invite already used';
+  end if;
+
+  if v_invite.expires_at < now() then
+    raise exception 'invite expired';
+  end if;
+
+  insert into profiles (id, hotel_id, full_name, role)
+  values (v_user_id, v_invite.hotel_id, p_full_name, v_invite.role);
+
+  insert into profile_hotels (profile_id, hotel_id, role)
+  values (v_user_id, v_invite.hotel_id, v_invite.role)
+  on conflict (profile_id, hotel_id) do update set role = excluded.role;
+
+  update invites set used_at = now(), used_by = v_user_id where id = v_invite.id;
+
+  return v_invite.hotel_id;
+end;
+$$;
+
+-- Creates a brand-new property (hotel) owned by the current admin and grants
+-- them access to it, without switching the active property.
+create or replace function create_property(p_name text)
+returns uuid
+language plpgsql
+security definer
+set search_path = public
+as $$
+declare
+  v_role text;
+  v_new_hotel_id uuid;
+begin
+  select role into v_role from profiles where id = auth.uid();
+
+  if v_role is distinct from 'admin' then
+    raise exception 'only admins can add properties';
+  end if;
+
+  if coalesce(trim(p_name), '') = '' then
+    raise exception 'name required';
+  end if;
+
+  insert into hotels (name) values (trim(p_name)) returning id into v_new_hotel_id;
+
+  insert into profile_hotels (profile_id, hotel_id, role)
+  values (auth.uid(), v_new_hotel_id, 'admin');
+
+  return v_new_hotel_id;
+end;
+$$;
+
+grant execute on function create_property(text) to authenticated;
+
+-- Switches the current profile's active property. Every table's RLS policy
+-- reads auth_hotel_id()/auth_role(), which resolve from profiles, so this
+-- single update is enough to change what the whole app shows.
+create or replace function switch_property(p_hotel_id uuid)
+returns void
+language plpgsql
+security definer
+set search_path = public
+as $$
+declare
+  v_role text;
+begin
+  select role into v_role from profile_hotels
+    where profile_id = auth.uid() and hotel_id = p_hotel_id;
+
+  if v_role is null then
+    raise exception 'not a member of this property';
+  end if;
+
+  update profiles set hotel_id = p_hotel_id, role = v_role where id = auth.uid();
+end;
+$$;
+
+grant execute on function switch_property(uuid) to authenticated;

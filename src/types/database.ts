@@ -139,6 +139,18 @@ export interface ParkingSpot {
   created_at: string;
 }
 
+export interface ProfileHotel {
+  id: string;
+  profile_id: string;
+  hotel_id: string;
+  role: StaffRole;
+  created_at: string;
+}
+
+export interface ProfileHotelWithName extends ProfileHotel {
+  hotel: Pick<Hotel, "id" | "name"> | null;
+}
+
 export type InviteRole = "manager" | "staff";
 
 export interface Invite {

@@ -1,6 +1,5 @@
 import type { ReactNode } from "react";
 import {
-  BedDouble,
   LayoutDashboard,
   ClipboardList,
   Users,
@@ -16,26 +15,36 @@ import {
 } from "lucide-react";
 import { requireProfile } from "@/lib/current-user";
 import { getDictionary } from "@/lib/i18n/get-locale";
+import { createClient } from "@/lib/supabase/server";
 import { LanguageSwitcher } from "@/components/language-switcher";
+import type { ProfileHotelWithName } from "@/types/database";
 import { logout } from "../(auth)/actions";
 import { NavLink } from "./nav-link";
+import { PropertySwitcher } from "./property-switcher";
 
 export default async function AppLayout({ children }: { children: ReactNode }) {
   const { profile, hotel } = await requireProfile();
   const { locale, t } = await getDictionary();
   const canManage = profile.role === "admin" || profile.role === "manager";
 
+  const supabase = await createClient();
+  const { data: properties } = await supabase
+    .from("profile_hotels")
+    .select("*, hotel:hotels(id, name)")
+    .eq("profile_id", profile.id)
+    .order("created_at")
+    .returns<ProfileHotelWithName[]>();
+
   return (
     <div className="flex min-h-screen bg-slate-50">
       <aside className="flex w-64 shrink-0 flex-col bg-gradient-to-b from-stone-800 via-stone-800 to-stone-900 p-4 shadow-xl print:hidden">
-        <div className="flex items-center gap-2.5 px-2 pb-4">
-          <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-white/15 text-white">
-            <BedDouble className="h-5 w-5" />
-          </div>
-          <div className="min-w-0">
-            <p className="truncate text-sm font-semibold text-white">{hotel.name}</p>
-            <p className="text-xs text-stone-300">Hotel Ops</p>
-          </div>
+        <div className="pb-4">
+          <PropertySwitcher
+            properties={properties ?? []}
+            currentHotelId={hotel.id}
+            currentHotelName={hotel.name}
+            canAdd={profile.role === "admin"}
+          />
         </div>
 
         <div className="px-2 pb-6">
