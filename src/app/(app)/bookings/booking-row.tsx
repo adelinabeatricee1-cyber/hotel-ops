@@ -2,7 +2,7 @@
 
 import { useState, useTransition } from "react";
 import Link from "next/link";
-import { Trash2, Receipt, ExternalLink, Link2, Check, MessageCircle, Star } from "lucide-react";
+import { Trash2, Receipt, ExternalLink, Link2, Check, MessageCircle, Star, Users } from "lucide-react";
 import type { BookingWithRoom, Hotel, PaymentStatus } from "@/types/database";
 import { todayDateString } from "@/lib/date-utils";
 import { deleteBooking, setPaymentStatus } from "./actions";
@@ -33,7 +33,15 @@ function daysSince(dateStr: string, todayStr: string) {
   return Math.round((now - then) / (1000 * 60 * 60 * 24));
 }
 
-export function BookingRow({ booking, hotel }: { booking: BookingWithRoom; hotel: Hotel }) {
+export function BookingRow({
+  booking,
+  hotel,
+  groupSize,
+}: {
+  booking: BookingWithRoom;
+  hotel: Hotel;
+  groupSize?: number;
+}) {
   const [isPending, startTransition] = useTransition();
   const [amountPaid, setAmountPaid] = useState(String(booking.amount_paid ?? 0));
   const [linkCopied, setLinkCopied] = useState(false);
@@ -107,7 +115,18 @@ export function BookingRow({ booking, hotel }: { booking: BookingWithRoom; hotel
   return (
     <tr className="border-b border-slate-100 last:border-0 align-top">
       <td className="py-3 pr-4">
-        <p className="text-sm font-semibold text-slate-900">{booking.guest_name}</p>
+        <p className="text-sm font-semibold text-slate-900">
+          {booking.guest_name}
+          {groupSize && groupSize > 1 && (
+            <span
+              className="ml-1.5 inline-flex items-center gap-0.5 rounded-full bg-violet-100 px-1.5 py-0.5 text-[10px] font-semibold text-violet-700"
+              title="Rezervare de grup"
+            >
+              <Users className="h-2.5 w-2.5" />
+              Grup · {groupSize} camere
+            </span>
+          )}
+        </p>
         <p className="text-xs text-slate-500">{booking.phone || "—"}</p>
       </td>
       <td className="py-3 pr-4 text-sm text-slate-700">

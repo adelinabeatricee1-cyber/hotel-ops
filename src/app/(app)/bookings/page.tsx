@@ -5,6 +5,7 @@ import { requireAdmin } from "@/lib/current-user";
 import type { BookingWithRoom, Guest, Room } from "@/types/database";
 import { BookingRow } from "./booking-row";
 import { CreateBookingForm } from "./create-booking-form";
+import { GroupBookingForm } from "./group-booking-form";
 
 export default async function BookingsPage() {
   const { hotel } = await requireAdmin();
@@ -19,6 +20,13 @@ export default async function BookingsPage() {
     supabase.from("rooms").select("*").order("number").returns<Room[]>(),
     supabase.from("guests").select("*").order("name").returns<Guest[]>(),
   ]);
+
+  const groupCounts: Record<string, number> = {};
+  for (const booking of bookings ?? []) {
+    if (booking.group_id) {
+      groupCounts[booking.group_id] = (groupCounts[booking.group_id] ?? 0) + 1;
+    }
+  }
 
   return (
     <div>
@@ -55,6 +63,10 @@ export default async function BookingsPage() {
         <CreateBookingForm rooms={rooms ?? []} guests={guests ?? []} />
       </div>
 
+      <div className="mt-3 rounded-xl border border-slate-100 bg-white p-4 shadow-sm">
+        <GroupBookingForm rooms={rooms ?? []} />
+      </div>
+
       <div className="mt-4 overflow-x-auto rounded-xl border border-slate-100 bg-white p-4 shadow-sm">
         {bookings && bookings.length > 0 ? (
           <table className="w-full min-w-[820px]">
@@ -71,7 +83,12 @@ export default async function BookingsPage() {
             </thead>
             <tbody>
               {bookings.map((booking) => (
-                <BookingRow key={booking.id} booking={booking} hotel={hotel} />
+                <BookingRow
+                  key={booking.id}
+                  booking={booking}
+                  hotel={hotel}
+                  groupSize={booking.group_id ? groupCounts[booking.group_id] : undefined}
+                />
               ))}
             </tbody>
           </table>

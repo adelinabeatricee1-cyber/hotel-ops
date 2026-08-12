@@ -1008,3 +1008,12 @@ create policy "shifts: admin/manager update" on shifts
 drop policy if exists "shifts: admin/manager delete" on shifts;
 create policy "shifts: admin/manager delete" on shifts
   for delete using (hotel_id = auth_hotel_id() and auth_role() in ('admin', 'manager'));
+
+-- ---------------------------------------------------------------------------
+-- Group bookings: multiple rooms under one reservation. Modeled as several
+-- bookings rows (one per room, so per-room housekeeping/status/pricing keeps
+-- working unchanged) tagged with a shared group_id.
+-- ---------------------------------------------------------------------------
+
+alter table bookings add column if not exists group_id uuid;
+create index if not exists bookings_group_id_idx on bookings (group_id);
