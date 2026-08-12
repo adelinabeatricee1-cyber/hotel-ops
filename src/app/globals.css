@@ -35,3 +35,98 @@ select,
 textarea {
   color: #0f172a;
 }
+
+/* Dark mode — scoped to the admin app shell only (#app-shell), never the
+   guest portal or public booking pages, which keep their own fixed brand. */
+#app-shell.dark {
+  color-scheme: dark;
+  background-color: #0f172a;
+}
+
+#app-shell.dark .bg-white {
+  background-color: #1e293b;
+}
+#app-shell.dark .bg-slate-50 {
+  background-color: #0f172a;
+}
+#app-shell.dark .bg-slate-100 {
+  background-color: #334155;
+}
+
+#app-shell.dark .text-slate-900 {
+  color: #f1f5f9;
+}
+#app-shell.dark .text-slate-800 {
+  color: #e2e8f0;
+}
+#app-shell.dark .text-slate-700 {
+  color: #cbd5e1;
+}
+#app-shell.dark .text-slate-600 {
+  color: #cbd5e1;
+}
+#app-shell.dark .text-slate-500 {
+  color: #94a3b8;
+}
+#app-shell.dark .text-slate-400 {
+  color: #64748b;
+}
+
+#app-shell.dark .border-slate-100,
+#app-shell.dark .divide-slate-100 {
+  border-color: #334155;
+}
+#app-shell.dark .border-slate-200 {
+  border-color: #334155;
+}
+#app-shell.dark .border-slate-300 {
+  border-color: #475569;
+}
+
+#app-shell.dark input,
+#app-shell.dark select,
+#app-shell.dark textarea {
+  background-color: #1e293b;
+  color: #f1f5f9;
+  border-color: #475569;
+}
+#app-shell.dark input::placeholder,
+#app-shell.dark textarea::placeholder {
+  color: #64748b;
+}
+
+#app-shell.dark table {
+  color: inherit;
+}
+
+/* Light "chip" backgrounds (icon wraps, badges) get a translucent dark
+   version instead of a solid one, so the paired -600/-700 text stays legible. */
+#app-shell.dark .bg-olive-50,
+#app-shell.dark .bg-olive-100 {
+  background-color: rgb(122 127 66 / 0.25);
+}
+#app-shell.dark .bg-emerald-50,
+#app-shell.dark .bg-emerald-100 {
+  background-color: rgb(16 185 129 / 0.2);
+}
+#app-shell.dark .bg-amber-50,
+#app-shell.dark .bg-amber-100 {
+  background-color: rgb(245 158 11 / 0.2);
+}
+#app-shell.dark .bg-sky-50,
+#app-shell.dark .bg-sky-100 {
+  background-color: rgb(14 165 233 / 0.2);
+}
+#app-shell.dark .bg-red-50,
+#app-shell.dark .bg-red-100 {
+  background-color: rgb(239 68 68 / 0.2);
+}
+#app-shell.dark .bg-violet-100 {
+  background-color: rgb(139 92 246 / 0.2);
+}
+#app-shell.dark .bg-fuchsia-100 {
+  background-color: rgb(217 70 239 / 0.2);
+}
+#app-shell.dark .bg-indigo-100 {
+  background-color: rgb(99 102 241 / 0.2);
+}

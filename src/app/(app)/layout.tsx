@@ -22,6 +22,7 @@ import { logout } from "../(auth)/actions";
 import { GlobalSearch } from "./global-search";
 import { NavLink } from "./nav-link";
 import { PropertySwitcher } from "./property-switcher";
+import { ThemeToggle } from "./theme-toggle";
 
 export default async function AppLayout({ children }: { children: ReactNode }) {
   const { profile, hotel } = await requireProfile();
@@ -37,7 +38,7 @@ export default async function AppLayout({ children }: { children: ReactNode }) {
     .returns<ProfileHotelWithName[]>();
 
   return (
-    <div className="flex min-h-screen bg-slate-50">
+    <div id="app-shell" className="flex min-h-screen bg-slate-50">
       <aside className="flex w-64 shrink-0 flex-col bg-gradient-to-b from-stone-800 via-stone-800 to-stone-900 p-4 shadow-xl print:hidden">
         <div className="pb-4">
           <PropertySwitcher
@@ -52,8 +53,11 @@ export default async function AppLayout({ children }: { children: ReactNode }) {
           <GlobalSearch />
         </div>
 
-        <div className="px-2 pb-6">
+        <div className="px-2 pb-2">
           <LanguageSwitcher locale={locale} />
+        </div>
+        <div className="px-2 pb-6">
+          <ThemeToggle />
         </div>
 
         <nav className="flex flex-1 flex-col gap-1">
