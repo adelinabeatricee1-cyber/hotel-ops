@@ -246,6 +246,15 @@ as $$
   select role from profiles where id = auth.uid();
 $$;
 
+-- Was missing: without this, every Settings save (Wi-Fi, cover image,
+-- monthly target, cancellation policy, etc.) silently updates 0 rows —
+-- Supabase returns success with no error, so nothing appears to save.
+drop policy if exists "hotels: admin/manager update" on hotels;
+create policy "hotels: admin/manager update" on hotels
+  for update
+  using (id = auth_hotel_id() and auth_role() in ('admin', 'manager'))
+  with check (id = auth_hotel_id() and auth_role() in ('admin', 'manager'));
+
 drop policy if exists "invites: admin/manager manage own hotel" on invites;
 create policy "invites: admin/manager manage own hotel" on invites
   for all
