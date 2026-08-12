@@ -3,8 +3,58 @@
 import { revalidatePath } from "next/cache";
 import { createClient } from "@/lib/supabase/server";
 import { requireProfile } from "@/lib/current-user";
+import { todayDateString } from "@/lib/date-utils";
 import type { ChecklistItem, TaskStatus, TaskType } from "@/types/database";
 import { DEFAULT_CHECKLIST } from "./labels";
+
+// Called from the Tasks page on every load: for any room checking out today
+// that doesn't already have a housekeeping task created today, auto-creates
+// one. Idempotent (safe to call repeatedly) — no separate cron job needed.
+export async function ensureCheckoutHousekeepingTasks() {
+  const { profile } = await requireProfile();
+  const supabase = await createClient();
+  const today = todayDateString();
+
+  const { data: dueOutBookings } = await supabase
+    .from("bookings")
+    .select("room_id")
+    .eq("checkout", today)
+    .in("status", ["confirmed", "checked_in"]);
+
+  const roomIds = [
+    ...new Set((dueOutBookings ?? []).map((b) => b.room_id).filter((id): id is string => Boolean(id))),
+  ];
+  if (roomIds.length === 0) return;
+
+  const { data: existingTasks } = await supabase
+    .from("tasks")
+    .select("room_id")
+    .eq("type", "housekeeping")
+    .in("room_id", roomIds)
+    .gte("created_at", today);
+
+  const roomsWithTask = new Set((existingTasks ?? []).map((t) => t.room_id));
+  const roomsNeedingTask = roomIds.filter((id) => !roomsWithTask.has(id));
+  if (roomsNeedingTask.length === 0) return;
+
+  const checklist: ChecklistItem[] = DEFAULT_CHECKLIST.housekeeping.map((label) => ({ label, done: false }));
+
+  await supabase.from("tasks").insert(
+    roomsNeedingTask.map((roomId) => ({
+      hotel_id: profile.hotel_id,
+      room_id: roomId,
+      type: "housekeeping" as TaskType,
+      notes: "Curățenie automată — cameră eliberată azi.",
+      checklist,
+    })),
+  );
+
+  await supabase
+    .from("rooms")
+    .update({ status: "dirty" })
+    .in("id", roomsNeedingTask)
+    .eq("status", "clean");
+}
 
 export async function createTask(_prevState: { error?: string } | undefined, formData: FormData) {
   const { profile } = await requireProfile();

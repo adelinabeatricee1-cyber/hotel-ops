@@ -2,6 +2,7 @@ import { ClipboardList } from "lucide-react";
 import { createClient } from "@/lib/supabase/server";
 import { todayDateString } from "@/lib/date-utils";
 import type { Room, Staff, TaskStatus, TaskWithRelations } from "@/types/database";
+import { ensureCheckoutHousekeepingTasks } from "./actions";
 import { CreateTaskForm } from "./create-task-form";
 import {
   TASK_STATUS_COLUMN_STYLE,
@@ -12,6 +13,7 @@ import {
 import { TaskCard } from "./task-card";
 
 export default async function TasksPage() {
+  await ensureCheckoutHousekeepingTasks();
   const supabase = await createClient();
   const today = todayDateString();
 

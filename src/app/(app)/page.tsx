@@ -27,6 +27,7 @@ import { getDictionary } from "@/lib/i18n/get-locale";
 import { resolveMonth, todayDateString } from "@/lib/date-utils";
 import type { RoomStatus, Supply, TaskStatus } from "@/types/database";
 import { TargetCard } from "./reports/target-card";
+import { ensureCheckoutHousekeepingTasks } from "./tasks/actions";
 
 const ROOM_STATUS_META: Record<RoomStatus, { icon: LucideIcon; ring: string; iconWrap: string }> = {
   clean: { icon: Sparkles, ring: "border-emerald-100", iconWrap: "bg-emerald-100 text-emerald-600" },
@@ -61,6 +62,7 @@ export default async function DashboardPage() {
   const { hotel, profile } = await requireProfile();
   const { t } = await getDictionary();
   const canSeePayments = profile.role === "admin" || profile.role === "manager";
+  await ensureCheckoutHousekeepingTasks();
   const supabase = await createClient();
   const today = todayDateString();
   const month = resolveMonth(undefined);
