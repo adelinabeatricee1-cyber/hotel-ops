@@ -68,7 +68,7 @@ export async function signup(_prevState: { error?: string } | undefined, formDat
     return { error: `Contul a fost creat, dar configurarea hotelului a eșuat: ${rpcError.message}` };
   }
 
-  redirect("/");
+  redirect("/onboarding");
 }
 
 export async function logout() {

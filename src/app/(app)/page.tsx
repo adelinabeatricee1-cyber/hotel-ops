@@ -393,10 +393,14 @@ export default async function DashboardPage() {
           <BedDouble className="h-6 w-6 text-slate-400" />
           <p className="text-sm text-slate-500">
             Nu ai adăugat încă nicio cameră.{" "}
-            <Link href="/rooms" className="font-medium text-olive-700 hover:text-olive-800">
-              Adaugă prima cameră
+            <Link href="/onboarding" className="font-medium text-olive-700 hover:text-olive-800">
+              Pornește ghidul de configurare
             </Link>
-            {" "}pentru a vedea date reale aici.
+            {" "}sau{" "}
+            <Link href="/rooms" className="font-medium text-olive-700 hover:text-olive-800">
+              adaugă prima cameră
+            </Link>
+            {" "}manual.
           </p>
         </div>
       )}
