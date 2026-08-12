@@ -76,3 +76,55 @@ export function todayDateString() {
   const now = new Date();
   return `${now.getFullYear()}-${pad(now.getMonth() + 1)}-${pad(now.getDate())}`;
 }
+
+const WEEKDAY_LABELS = ["Luni", "Marți", "Miercuri", "Joi", "Vineri", "Sâmbătă", "Duminică"];
+
+export interface WeekRange {
+  label: string;
+  param: string; // "YYYY-MM-DD" (Monday of the week)
+  days: string[]; // 7 days, Monday through Sunday
+  dayLabels: string[];
+  prevParam: string;
+  nextParam: string;
+}
+
+function startOfWeek(date: Date): Date {
+  const day = date.getUTCDay(); // 0 = Sunday
+  const diff = day === 0 ? -6 : 1 - day;
+  const monday = new Date(date);
+  monday.setUTCDate(monday.getUTCDate() + diff);
+  return monday;
+}
+
+export function resolveWeek(weekParam: string | undefined): WeekRange {
+  let base: Date;
+  if (weekParam && /^\d{4}-\d{2}-\d{2}$/.test(weekParam)) {
+    base = new Date(`${weekParam}T00:00:00Z`);
+  } else {
+    base = new Date();
+  }
+
+  const monday = startOfWeek(base);
+  const days = Array.from({ length: 7 }, (_, i) => {
+    const d = new Date(monday);
+    d.setUTCDate(d.getUTCDate() + i);
+    return `${d.getUTCFullYear()}-${pad(d.getUTCMonth() + 1)}-${pad(d.getUTCDate())}`;
+  });
+
+  const prev = new Date(monday);
+  prev.setUTCDate(prev.getUTCDate() - 7);
+  const next = new Date(monday);
+  next.setUTCDate(next.getUTCDate() + 7);
+
+  const lastDay = new Date(`${days[6]}T00:00:00Z`);
+  const label = `${dayOfMonthLabel(days[0])} ${MONTH_LABELS[new Date(`${days[0]}T00:00:00Z`).getUTCMonth()].slice(0, 3)} – ${dayOfMonthLabel(days[6])} ${MONTH_LABELS[lastDay.getUTCMonth()].slice(0, 3)}`;
+
+  return {
+    label,
+    param: days[0],
+    days,
+    dayLabels: WEEKDAY_LABELS,
+    prevParam: `${prev.getUTCFullYear()}-${pad(prev.getUTCMonth() + 1)}-${pad(prev.getUTCDate())}`,
+    nextParam: `${next.getUTCFullYear()}-${pad(next.getUTCMonth() + 1)}-${pad(next.getUTCDate())}`,
+  };
+}

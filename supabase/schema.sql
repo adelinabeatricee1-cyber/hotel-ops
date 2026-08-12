@@ -971,3 +971,40 @@ alter table supplies enable row level security;
 drop policy if exists "supplies: all own hotel" on supplies;
 create policy "supplies: all own hotel" on supplies
   for all using (hotel_id = auth_hotel_id()) with check (hotel_id = auth_hotel_id());
+
+-- ---------------------------------------------------------------------------
+-- Staff shift scheduling: a weekly grid of who works which shift, each day.
+-- Everyone in the hotel can see the schedule; only admin/manager build it
+-- (same access model as the staff directory itself).
+-- ---------------------------------------------------------------------------
+
+create table if not exists shifts (
+  id uuid primary key default gen_random_uuid(),
+  hotel_id uuid not null references hotels (id) on delete cascade,
+  staff_id uuid not null references staff (id) on delete cascade,
+  date date not null,
+  shift_type text not null check (shift_type in ('morning', 'afternoon', 'night')),
+  created_at timestamptz not null default now(),
+  unique (staff_id, date)
+);
+
+create index if not exists shifts_hotel_id_idx on shifts (hotel_id);
+create index if not exists shifts_date_idx on shifts (date);
+
+alter table shifts enable row level security;
+
+drop policy if exists "shifts: select own hotel" on shifts;
+create policy "shifts: select own hotel" on shifts
+  for select using (hotel_id = auth_hotel_id());
+
+drop policy if exists "shifts: admin/manager write" on shifts;
+create policy "shifts: admin/manager write" on shifts
+  for insert with check (hotel_id = auth_hotel_id() and auth_role() in ('admin', 'manager'));
+
+drop policy if exists "shifts: admin/manager update" on shifts;
+create policy "shifts: admin/manager update" on shifts
+  for update using (hotel_id = auth_hotel_id() and auth_role() in ('admin', 'manager'));
+
+drop policy if exists "shifts: admin/manager delete" on shifts;
+create policy "shifts: admin/manager delete" on shifts
+  for delete using (hotel_id = auth_hotel_id() and auth_role() in ('admin', 'manager'));

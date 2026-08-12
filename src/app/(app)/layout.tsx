@@ -11,6 +11,7 @@ import {
   Heart,
   SquareParking,
   Package,
+  CalendarClock,
   Settings,
 } from "lucide-react";
 import { requireProfile } from "@/lib/current-user";
@@ -66,6 +67,9 @@ export default async function AppLayout({ children }: { children: ReactNode }) {
           </NavLink>
           <NavLink href="/staff" icon={<Users className="h-4 w-4" />}>
             {t.nav.staff}
+          </NavLink>
+          <NavLink href="/schedule" icon={<CalendarClock className="h-4 w-4" />}>
+            {t.nav.schedule}
           </NavLink>
           <NavLink href="/supplies" icon={<Package className="h-4 w-4" />}>
             {t.nav.supplies}

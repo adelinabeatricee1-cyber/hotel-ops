@@ -6,6 +6,7 @@ export type BookingStatus = "confirmed" | "checked_in" | "checked_out" | "cancel
 export type PaymentStatus = "unpaid" | "partial" | "paid";
 export type StaffRole = "admin" | "manager" | "staff";
 export type ParkingStatus = "available" | "occupied";
+export type ShiftType = "morning" | "afternoon" | "night";
 
 export interface Hotel {
   id: string;
@@ -115,6 +116,15 @@ export interface Supply {
   unit: string;
   quantity: number;
   low_stock_threshold: number;
+  created_at: string;
+}
+
+export interface Shift {
+  id: string;
+  hotel_id: string;
+  staff_id: string;
+  date: string;
+  shift_type: ShiftType;
   created_at: string;
 }
 

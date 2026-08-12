@@ -8,6 +8,7 @@ export interface Dictionary {
     guests: string;
     housekeeping: string;
     staff: string;
+    schedule: string;
     reports: string;
     parking: string;
     supplies: string;
@@ -58,6 +59,7 @@ export const dictionaries: Record<Locale, Dictionary> = {
       guests: "Clienți fideli",
       housekeeping: "Housekeeping",
       staff: "Personal",
+      schedule: "Program tură",
       reports: "Rapoarte",
       parking: "Parcare",
       supplies: "Provizii",
@@ -115,6 +117,7 @@ export const dictionaries: Record<Locale, Dictionary> = {
       guests: "Loyal guests",
       housekeeping: "Housekeeping",
       staff: "Staff",
+      schedule: "Shift schedule",
       reports: "Reports",
       parking: "Parking",
       supplies: "Supplies",
