@@ -48,6 +48,11 @@ export interface Staff {
   created_at: string;
 }
 
+export interface ChecklistItem {
+  label: string;
+  done: boolean;
+}
+
 export interface Task {
   id: string;
   hotel_id: string;
@@ -56,6 +61,8 @@ export interface Task {
   assigned_to: string | null;
   status: TaskStatus;
   notes: string | null;
+  checklist: ChecklistItem[];
+  photo_url: string | null;
   created_at: string;
 }
 

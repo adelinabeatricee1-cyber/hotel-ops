@@ -37,3 +37,15 @@ export const TASK_TYPE_ICONS: Record<TaskType, LucideIcon> = {
   housekeeping: Sparkles,
   maintenance: Wrench,
 };
+
+export const DEFAULT_CHECKLIST: Record<TaskType, string[]> = {
+  housekeeping: [
+    "Pat făcut",
+    "Baie curățată",
+    "Praf șters",
+    "Gunoi golit",
+    "Prosoape și lenjerie schimbate",
+    "Minibar verificat",
+  ],
+  maintenance: [],
+};

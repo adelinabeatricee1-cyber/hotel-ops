@@ -925,3 +925,25 @@ grant execute on function submit_guest_feedback(uuid, text) to anon, authenticat
 -- ---------------------------------------------------------------------------
 
 alter table hotels add column if not exists google_review_url text;
+
+-- ---------------------------------------------------------------------------
+-- Housekeeping checklist + photo proof: each housekeeping task gets a
+-- checklist of standard cleaning steps (stored as JSON so staff can check
+-- items off) and an optional proof photo before it can be marked done.
+-- ---------------------------------------------------------------------------
+
+alter table tasks add column if not exists checklist jsonb not null default '[]'::jsonb;
+alter table tasks add column if not exists photo_url text;
+
+insert into storage.buckets (id, name, public)
+values ('task-photos', 'task-photos', true)
+on conflict (id) do nothing;
+
+drop policy if exists "task-photos: authenticated insert" on storage.objects;
+create policy "task-photos: authenticated insert" on storage.objects
+  for insert to authenticated
+  with check (bucket_id = 'task-photos');
+
+drop policy if exists "task-photos: public read" on storage.objects;
+create policy "task-photos: public read" on storage.objects
+  for select using (bucket_id = 'task-photos');

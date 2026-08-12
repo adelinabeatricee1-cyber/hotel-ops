@@ -1,9 +1,9 @@
 "use client";
 
-import { useTransition } from "react";
-import { AlertTriangle, Clock3, Trash2, User } from "lucide-react";
+import { useState, useTransition } from "react";
+import { AlertTriangle, Camera, Clock3, Trash2, User } from "lucide-react";
 import type { TaskStatus, TaskWithRelations } from "@/types/database";
-import { deleteTask, setTaskStatus } from "./actions";
+import { deleteTask, setTaskStatus, toggleChecklistItem, uploadTaskPhoto } from "./actions";
 import {
   TASK_STATUS_BORDER,
   TASK_STATUS_LABELS,
@@ -22,11 +22,33 @@ export function TaskCard({
   turnover?: boolean;
 }) {
   const [isPending, startTransition] = useTransition();
+  const [photoError, setPhotoError] = useState<string | null>(null);
   const TypeIcon = TASK_TYPE_ICONS[task.type];
   const isPriority = task.status !== "done" && (dueOut || turnover);
 
+  const checklistComplete = task.checklist.length === 0 || task.checklist.every((item) => item.done);
+  const requiresProof = task.type === "housekeeping" && task.checklist.length > 0;
+  const canComplete = !requiresProof || (checklistComplete && !!task.photo_url);
+
   function handleStatusChange(status: TaskStatus) {
     startTransition(() => setTaskStatus(task.id, status));
+  }
+
+  function handleToggleChecklist(index: number) {
+    startTransition(() => toggleChecklistItem(task.id, index));
+  }
+
+  function handlePhotoChange(e: React.ChangeEvent<HTMLInputElement>) {
+    const file = e.target.files?.[0];
+    e.target.value = "";
+    if (!file) return;
+    const formData = new FormData();
+    formData.append("photo", file);
+    setPhotoError(null);
+    startTransition(async () => {
+      const result = await uploadTaskPhoto(task.id, formData);
+      if (result?.error) setPhotoError(result.error);
+    });
   }
 
   function handleDelete() {
@@ -74,13 +96,65 @@ export function TaskCard({
       </p>
       {task.notes && <p className="mt-1 text-sm text-slate-500">{task.notes}</p>}
 
+      {task.checklist.length > 0 && (
+        <div className="mt-3 space-y-1 rounded-lg bg-slate-50 p-2">
+          {task.checklist.map((item, index) => (
+            <label key={item.label} className="flex items-center gap-2 text-xs text-slate-600">
+              <input
+                type="checkbox"
+                checked={item.done}
+                disabled={isPending}
+                onChange={() => handleToggleChecklist(index)}
+                className="h-3.5 w-3.5 rounded border-slate-300 text-olive-600 focus:ring-olive-500"
+              />
+              <span className={item.done ? "text-slate-400 line-through" : ""}>{item.label}</span>
+            </label>
+          ))}
+        </div>
+      )}
+
+      {requiresProof && (
+        <div className="mt-3">
+          {task.photo_url ? (
+            <a href={task.photo_url} target="_blank" rel="noopener noreferrer" className="inline-block">
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img
+                src={task.photo_url}
+                alt="Dovadă curățenie"
+                className="h-16 w-16 rounded-lg object-cover ring-1 ring-slate-200"
+              />
+            </a>
+          ) : (
+            <label className="inline-flex cursor-pointer items-center gap-1 text-xs font-medium text-olive-700 hover:text-olive-800">
+              <Camera className="h-3.5 w-3.5" />
+              {isPending ? "Se încarcă..." : "Adaugă poză dovadă"}
+              <input
+                type="file"
+                accept="image/*"
+                capture="environment"
+                className="hidden"
+                onChange={handlePhotoChange}
+                disabled={isPending}
+              />
+            </label>
+          )}
+          {photoError && <p className="mt-1 text-xs text-red-600">{photoError}</p>}
+          {!canComplete && (
+            <p className="mt-1 text-xs text-slate-400">
+              Bifează toate punctele și adaugă o poză pentru a finaliza.
+            </p>
+          )}
+        </div>
+      )}
+
       <div className="mt-3 flex flex-wrap gap-1.5">
         {TASK_STATUS_ORDER.map((status) => (
           <button
             key={status}
             type="button"
-            disabled={isPending || status === task.status}
+            disabled={isPending || status === task.status || (status === "done" && !canComplete)}
             onClick={() => handleStatusChange(status)}
+            title={status === "done" && !canComplete ? "Bifează checklist-ul și adaugă o poză mai întâi" : undefined}
             className="rounded-md border border-slate-200 px-2 py-1 text-xs font-medium text-slate-600 transition hover:border-olive-300 hover:bg-olive-50 hover:text-olive-800 disabled:cursor-not-allowed disabled:opacity-40 disabled:hover:border-slate-200 disabled:hover:bg-transparent disabled:hover:text-slate-600"
           >
             {TASK_STATUS_LABELS[status]}
