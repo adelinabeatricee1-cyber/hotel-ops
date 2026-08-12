@@ -2,8 +2,9 @@
 
 import { useState, useTransition } from "react";
 import Link from "next/link";
-import { Trash2, Receipt, ExternalLink, Link2, Check } from "lucide-react";
-import type { BookingWithRoom, PaymentStatus } from "@/types/database";
+import { Trash2, Receipt, ExternalLink, Link2, Check, MessageCircle } from "lucide-react";
+import type { BookingWithRoom, Hotel, PaymentStatus } from "@/types/database";
+import { todayDateString } from "@/lib/date-utils";
 import { deleteBooking, setPaymentStatus } from "./actions";
 import { PAYMENT_STATUS_LABELS, PAYMENT_STATUS_STYLES, SOURCE_ICONS, SOURCE_LABELS } from "./labels";
 
@@ -13,17 +14,53 @@ function formatDate(value: string) {
   return new Date(value).toLocaleDateString("ro-RO");
 }
 
-export function BookingRow({ booking }: { booking: BookingWithRoom }) {
+function tomorrowDateString() {
+  const d = new Date();
+  d.setDate(d.getDate() + 1);
+  return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`;
+}
+
+function normalizePhone(phone: string) {
+  const digits = phone.replace(/[^\d]/g, "");
+  if (digits.startsWith("0")) return `4${digits}`;
+  if (digits.startsWith("40")) return digits;
+  return digits;
+}
+
+export function BookingRow({ booking, hotel }: { booking: BookingWithRoom; hotel: Hotel }) {
   const [isPending, startTransition] = useTransition();
   const [amountPaid, setAmountPaid] = useState(String(booking.amount_paid ?? 0));
   const [linkCopied, setLinkCopied] = useState(false);
   const SourceIcon = SOURCE_ICONS[booking.source];
+
+  const today = todayDateString();
+  const tomorrow = tomorrowDateString();
+  const isCheckinSoon =
+    (booking.status === "confirmed" || booking.status === "checked_in") &&
+    (booking.checkin === today || booking.checkin === tomorrow);
 
   function handleCopyGuestLink() {
     const link = `${window.location.origin}/my-booking/${booking.guest_access_token}`;
     navigator.clipboard.writeText(link);
     setLinkCopied(true);
     setTimeout(() => setLinkCopied(false), 2000);
+  }
+
+  function handleSendWelcome() {
+    if (!booking.phone) return;
+    const link = `${window.location.origin}/my-booking/${booking.guest_access_token}`;
+    const lines = [
+      `Bună, ${booking.guest_name}! Vă așteptăm la ${hotel.name}.`,
+      `Check-in: ${formatDate(booking.checkin)}${booking.room ? ` · Camera ${booking.room.number}` : ""}.`,
+    ];
+    if (hotel.wifi_network) {
+      lines.push(`Wi-Fi: ${hotel.wifi_network}${hotel.wifi_password ? ` / parola: ${hotel.wifi_password}` : ""}.`);
+    }
+    lines.push(`Detaliile rezervării dvs.: ${link}`);
+    lines.push("Vă mulțumim și vă așteptăm cu drag!");
+
+    const waLink = `https://wa.me/${normalizePhone(booking.phone)}?text=${encodeURIComponent(lines.join("\n"))}`;
+    window.open(waLink, "_blank", "noopener,noreferrer");
   }
 
   function handlePaymentStatusChange(status: PaymentStatus) {
@@ -55,6 +92,11 @@ export function BookingRow({ booking }: { booking: BookingWithRoom }) {
       </td>
       <td className="py-3 pr-4 text-sm text-slate-600">
         {formatDate(booking.checkin)} → {formatDate(booking.checkout)}
+        {isCheckinSoon && (
+          <span className="ml-1.5 inline-flex items-center rounded-full bg-amber-100 px-2 py-0.5 text-[11px] font-semibold text-amber-700">
+            {booking.checkin === today ? "Check-in azi" : "Check-in mâine"}
+          </span>
+        )}
       </td>
       <td className="py-3 pr-4">
         <span className="inline-flex items-center gap-1 rounded-full bg-slate-100 px-2.5 py-0.5 text-xs font-medium text-slate-700">
@@ -117,6 +159,17 @@ export function BookingRow({ booking }: { booking: BookingWithRoom }) {
       </td>
       <td className="py-3 text-right">
         <div className="flex items-center justify-end gap-3">
+          {isCheckinSoon && booking.phone && (
+            <button
+              type="button"
+              onClick={handleSendWelcome}
+              className="inline-flex items-center gap-1 text-xs font-medium text-emerald-600 hover:text-emerald-700"
+              title="Trimite mesaj de bun venit pe WhatsApp"
+            >
+              <MessageCircle className="h-3.5 w-3.5" />
+              Bun venit
+            </button>
+          )}
           <button
             type="button"
             onClick={handleCopyGuestLink}

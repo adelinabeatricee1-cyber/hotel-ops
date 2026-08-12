@@ -71,7 +71,7 @@ export default async function BookingsPage() {
             </thead>
             <tbody>
               {bookings.map((booking) => (
-                <BookingRow key={booking.id} booking={booking} />
+                <BookingRow key={booking.id} booking={booking} hotel={hotel} />
               ))}
             </tbody>
           </table>
