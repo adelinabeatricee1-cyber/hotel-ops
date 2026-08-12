@@ -19,6 +19,7 @@ import { createClient } from "@/lib/supabase/server";
 import { LanguageSwitcher } from "@/components/language-switcher";
 import type { ProfileHotelWithName } from "@/types/database";
 import { logout } from "../(auth)/actions";
+import { GlobalSearch } from "./global-search";
 import { NavLink } from "./nav-link";
 import { PropertySwitcher } from "./property-switcher";
 
@@ -45,6 +46,10 @@ export default async function AppLayout({ children }: { children: ReactNode }) {
             currentHotelName={hotel.name}
             canAdd={profile.role === "admin"}
           />
+        </div>
+
+        <div className="pb-4">
+          <GlobalSearch />
         </div>
 
         <div className="px-2 pb-6">
