@@ -46,7 +46,7 @@ export default async function SchedulePage({
         </p>
       )}
 
-      <div className="mt-5 flex items-center justify-between rounded-xl border border-slate-100 bg-white px-4 py-3 shadow-sm">
+      <div className="mt-5 flex flex-wrap items-center justify-between gap-2 rounded-xl border border-slate-100 bg-white px-4 py-3 shadow-sm">
         <Link
           href={`/schedule?week=${range.prevParam}`}
           className="inline-flex items-center gap-1 rounded-lg px-2 py-1 text-sm font-medium text-slate-600 hover:bg-slate-100"
@@ -54,7 +54,9 @@ export default async function SchedulePage({
           <ChevronLeft className="h-4 w-4" />
           Săptămâna anterioară
         </Link>
-        <p className="text-sm font-semibold text-slate-900">{range.label}</p>
+        <p className="order-first w-full text-center text-sm font-semibold text-slate-900 sm:order-none sm:w-auto">
+          {range.label}
+        </p>
         <Link
           href={`/schedule?week=${range.nextParam}`}
           className="inline-flex items-center gap-1 rounded-lg px-2 py-1 text-sm font-medium text-slate-600 hover:bg-slate-100"

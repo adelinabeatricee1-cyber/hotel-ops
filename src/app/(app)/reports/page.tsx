@@ -143,7 +143,7 @@ export default async function ReportsPage({
         <ExportButtons monthLabel={range.label} rows={exportRows} />
       </div>
 
-      <div className="mt-5 flex items-center justify-between rounded-xl border border-slate-100 bg-white px-4 py-3 shadow-sm">
+      <div className="mt-5 flex flex-wrap items-center justify-between gap-2 rounded-xl border border-slate-100 bg-white px-4 py-3 shadow-sm">
         <Link
           href={`/reports?month=${range.prevParam}`}
           className="inline-flex items-center gap-1 rounded-lg px-2 py-1 text-sm font-medium text-slate-600 hover:bg-slate-100"
@@ -151,7 +151,9 @@ export default async function ReportsPage({
           <ChevronLeft className="h-4 w-4" />
           Luna anterioară
         </Link>
-        <p className="text-sm font-semibold text-slate-900">{range.label}</p>
+        <p className="order-first w-full text-center text-sm font-semibold text-slate-900 sm:order-none sm:w-auto">
+          {range.label}
+        </p>
         <Link
           href={`/reports?month=${range.nextParam}`}
           className="inline-flex items-center gap-1 rounded-lg px-2 py-1 text-sm font-medium text-slate-600 hover:bg-slate-100"
@@ -201,26 +203,28 @@ export default async function ReportsPage({
 
       <div className="mt-6 rounded-xl border border-slate-100 bg-white p-4 shadow-sm">
         <h2 className="text-sm font-semibold text-slate-700">Rezervări pe sursă</h2>
-        <table className="mt-3 w-full text-sm">
-          <thead>
-            <tr className="border-b border-slate-200 text-left text-xs font-medium text-slate-500">
-              <th className="pb-2">Sursă</th>
-              <th className="pb-2">Rezervări</th>
-              <th className="pb-2 text-right">Venituri (RON)</th>
-            </tr>
-          </thead>
-          <tbody>
-            {SOURCE_ORDER.map((source) => (
-              <tr key={source} className="border-b border-slate-100 last:border-0">
-                <td className="py-2 text-slate-700">{SOURCE_LABELS[source]}</td>
-                <td className="py-2 text-slate-600">{bySource[source].count}</td>
-                <td className="py-2 text-right font-medium text-slate-900">
-                  {bySource[source].revenue.toFixed(2)}
-                </td>
+        <div className="w-full overflow-x-auto">
+          <table className="mt-3 w-full min-w-[360px] text-sm">
+            <thead>
+              <tr className="border-b border-slate-200 text-left text-xs font-medium text-slate-500">
+                <th className="pb-2">Sursă</th>
+                <th className="pb-2">Rezervări</th>
+                <th className="pb-2 text-right">Venituri (RON)</th>
               </tr>
-            ))}
-          </tbody>
-        </table>
+            </thead>
+            <tbody>
+              {SOURCE_ORDER.map((source) => (
+                <tr key={source} className="border-b border-slate-100 last:border-0">
+                  <td className="py-2 text-slate-700">{SOURCE_LABELS[source]}</td>
+                  <td className="py-2 text-slate-600">{bySource[source].count}</td>
+                  <td className="py-2 text-right font-medium text-slate-900">
+                    {bySource[source].revenue.toFixed(2)}
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
       </div>
     </div>
   );

@@ -69,7 +69,7 @@ export default async function InvoicePage({ params }: { params: Promise<{ id: st
       </div>
 
       <div className="rounded-2xl border border-slate-100 bg-white p-8 shadow-sm print:rounded-none print:border-0 print:shadow-none">
-        <div className="flex items-start justify-between border-b border-slate-100 pb-6">
+        <div className="flex flex-wrap items-start justify-between gap-4 border-b border-slate-100 pb-6">
           <div className="flex items-center gap-2.5">
             <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-gradient-to-br from-olive-600 to-olive-700 text-white">
               <BedDouble className="h-5 w-5" />
@@ -88,7 +88,7 @@ export default async function InvoicePage({ params }: { params: Promise<{ id: st
           </div>
         </div>
 
-        <div className="mt-6 grid grid-cols-2 gap-6">
+        <div className="mt-6 grid grid-cols-1 gap-6 sm:grid-cols-2">
           <div>
             <p className="text-xs font-semibold uppercase tracking-wide text-slate-400">
               Facturat către

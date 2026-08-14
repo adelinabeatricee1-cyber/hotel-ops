@@ -44,21 +44,23 @@ export default async function StaffPage() {
 
       <div className="mt-4 rounded-xl border border-slate-100 bg-white p-4 shadow-sm">
         {staff && staff.length > 0 ? (
-          <table className="w-full">
-            <thead>
-              <tr className="border-b border-slate-200 text-left text-xs font-medium text-slate-500">
-                <th className="pb-2">Nume</th>
-                <th className="pb-2">Rol</th>
-                <th className="pb-2">Telefon</th>
-                <th className="pb-2" />
-              </tr>
-            </thead>
-            <tbody>
-              {staff.map((member) => (
-                <StaffRow key={member.id} member={member} canManage={canManage} />
-              ))}
-            </tbody>
-          </table>
+          <div className="w-full overflow-x-auto">
+            <table className="w-full min-w-[420px]">
+              <thead>
+                <tr className="border-b border-slate-200 text-left text-xs font-medium text-slate-500">
+                  <th className="pb-2">Nume</th>
+                  <th className="pb-2">Rol</th>
+                  <th className="pb-2">Telefon</th>
+                  <th className="pb-2" />
+                </tr>
+              </thead>
+              <tbody>
+                {staff.map((member) => (
+                  <StaffRow key={member.id} member={member} canManage={canManage} />
+                ))}
+              </tbody>
+            </table>
+          </div>
         ) : (
           <p className="text-sm text-slate-500">Niciun membru al personalului adăugat încă.</p>
         )}
