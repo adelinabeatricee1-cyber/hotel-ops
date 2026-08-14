@@ -60,7 +60,7 @@ export function GroupBookingForm({ rooms }: { rooms: Room[] }) {
         </div>
       </div>
 
-      <div className="flex flex-wrap items-end gap-3">
+      <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-6">
         <div>
           <label htmlFor="group_guest_name" className="block text-xs font-medium text-slate-600">
             Nume oaspete / grup
@@ -70,7 +70,7 @@ export function GroupBookingForm({ rooms }: { rooms: Room[] }) {
             name="guest_name"
             required
             placeholder="Familia Popescu"
-            className="mt-1 w-44 rounded-lg border border-slate-300 px-2 py-1.5 text-sm shadow-sm focus:border-olive-500 focus:outline-none focus:ring-2 focus:ring-olive-500/20"
+            className="mt-1 w-full rounded-lg border border-slate-300 px-2 py-1.5 text-sm shadow-sm focus:border-olive-500 focus:outline-none focus:ring-2 focus:ring-olive-500/20"
           />
         </div>
         <div>
@@ -81,7 +81,7 @@ export function GroupBookingForm({ rooms }: { rooms: Room[] }) {
             id="group_phone"
             name="phone"
             placeholder="07xx xxx xxx"
-            className="mt-1 w-32 rounded-lg border border-slate-300 px-2 py-1.5 text-sm shadow-sm focus:border-olive-500 focus:outline-none focus:ring-2 focus:ring-olive-500/20"
+            className="mt-1 w-full rounded-lg border border-slate-300 px-2 py-1.5 text-sm shadow-sm focus:border-olive-500 focus:outline-none focus:ring-2 focus:ring-olive-500/20"
           />
         </div>
         <div>
@@ -93,7 +93,7 @@ export function GroupBookingForm({ rooms }: { rooms: Room[] }) {
             name="checkin"
             type="date"
             required
-            className="mt-1 rounded-lg border border-slate-300 px-2 py-1.5 text-sm shadow-sm focus:border-olive-500 focus:outline-none focus:ring-2 focus:ring-olive-500/20"
+            className="mt-1 w-full rounded-lg border border-slate-300 px-2 py-1.5 text-sm shadow-sm focus:border-olive-500 focus:outline-none focus:ring-2 focus:ring-olive-500/20"
           />
         </div>
         <div>
@@ -105,7 +105,7 @@ export function GroupBookingForm({ rooms }: { rooms: Room[] }) {
             name="checkout"
             type="date"
             required
-            className="mt-1 rounded-lg border border-slate-300 px-2 py-1.5 text-sm shadow-sm focus:border-olive-500 focus:outline-none focus:ring-2 focus:ring-olive-500/20"
+            className="mt-1 w-full rounded-lg border border-slate-300 px-2 py-1.5 text-sm shadow-sm focus:border-olive-500 focus:outline-none focus:ring-2 focus:ring-olive-500/20"
           />
         </div>
         <div>
@@ -115,7 +115,7 @@ export function GroupBookingForm({ rooms }: { rooms: Room[] }) {
           <select
             id="group_source"
             name="source"
-            className="mt-1 w-32 rounded-lg border border-slate-300 px-2 py-1.5 text-sm shadow-sm focus:border-olive-500 focus:outline-none focus:ring-2 focus:ring-olive-500/20"
+            className="mt-1 w-full rounded-lg border border-slate-300 px-2 py-1.5 text-sm shadow-sm focus:border-olive-500 focus:outline-none focus:ring-2 focus:ring-olive-500/20"
           >
             <option value="direct">Direct</option>
             <option value="booking">Booking.com</option>
@@ -133,17 +133,19 @@ export function GroupBookingForm({ rooms }: { rooms: Room[] }) {
             min="0"
             step="0.01"
             placeholder="opțional"
-            className="mt-1 w-28 rounded-lg border border-slate-300 px-2 py-1.5 text-sm shadow-sm focus:border-olive-500 focus:outline-none focus:ring-2 focus:ring-olive-500/20"
+            className="mt-1 w-full rounded-lg border border-slate-300 px-2 py-1.5 text-sm shadow-sm focus:border-olive-500 focus:outline-none focus:ring-2 focus:ring-olive-500/20"
           />
           <p className="mt-1 text-[11px] text-slate-400">Se împarte egal pe camere.</p>
         </div>
-        <button
-          type="submit"
-          disabled={pending}
-          className="inline-flex items-center gap-1.5 rounded-lg bg-gradient-to-r from-olive-600 to-olive-700 px-3 py-1.5 text-sm font-semibold text-white shadow-sm transition hover:from-olive-500 hover:to-olive-600 disabled:opacity-60"
-        >
-          {pending ? "Se creează..." : "Creează rezervarea de grup"}
-        </button>
+        <div className="col-span-full">
+          <button
+            type="submit"
+            disabled={pending}
+            className="inline-flex w-full items-center justify-center gap-1.5 rounded-lg bg-gradient-to-r from-olive-600 to-olive-700 px-3 py-1.5 text-sm font-semibold text-white shadow-sm transition hover:from-olive-500 hover:to-olive-600 disabled:opacity-60 sm:w-auto"
+          >
+            {pending ? "Se creează..." : "Creează rezervarea de grup"}
+          </button>
+        </div>
       </div>
       {state?.error && <p className="text-sm text-red-600">{state.error}</p>}
     </form>
